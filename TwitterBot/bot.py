@@ -29,7 +29,8 @@ def load_env_variables():
         "access_token": os.getenv("ACCESS_TOKEN_KEY"),
         "access_secret": os.getenv("ACCESS_TOKEN_SECRET"),
         "openai_key": os.getenv('OPENAI'),
-        "mongo_uri": os.getenv('MONGOURL')
+        "mongo_uri": os.getenv('MONGOURL'),
+        "host_url": os.getenv('HOST_URL')
     }
 
 
@@ -227,7 +228,7 @@ async def handle_remaining_tweet_text(to_convert: list, converted: list, db, twe
     await insert_tweet(db, tweet_id, all_converted_text)
 
 
-async def reply_to_tweet(tweet_id: str, reply_text: str, username_who_posted: str):
+async def reply_to_tweet(tweet_id: str, reply_text: str, username_who_posted: str, repy_tweet_id: str):
     """
     Replies to a tweet with the given text.
     """
@@ -245,7 +246,8 @@ async def reply_to_tweet(tweet_id: str, reply_text: str, username_who_posted: st
             tweet_id_to_reply = status[0]['id']
 
         if (len(reply_text) >= 2):
-            url_link = f"https://nvcthis.com"
+            base_url = env_vars['host_url']
+            url_link = base_url+repy_tweet_id
             final_text = f"Complete text available at {url_link}"
             await client.create_tweet(text=str(final_text), in_reply_to_tweet_id=tweet_id_to_reply)
 
@@ -313,7 +315,7 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
                         "<<>>")
                     tweets_to_reply = divide_into_tweets(
                         sentences=translated_text)
-                    await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, username_who_posted=username_who_posted)
+                    await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, username_who_posted=username_who_posted, repy_tweet_id=in_reply_to_tweet_id)
                     return
 
                 # Your code to get translated text
@@ -325,7 +327,7 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
                     logger.warning("No text recieved from NVC API")
                     return
                 logger.info(tweets_to_reply)
-                await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, username_who_posted=username_who_posted)
+                await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, username_who_posted=username_who_posted, repy_tweet_id=in_reply_to_tweet_id)
 
                 # code to store convert remaing text and store in database
                 await handle_remaining_tweet_text(
