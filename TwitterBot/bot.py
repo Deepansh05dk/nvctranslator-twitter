@@ -194,7 +194,7 @@ async def get_text_from_GPT(text: str) -> str:
                 "content": f"text is-'{text}'"
             }],
             temperature=0.1,
-            max_tokens=50
+            max_tokens=40
         )
         return response.choices[0].message.content
     except Exception as e:
