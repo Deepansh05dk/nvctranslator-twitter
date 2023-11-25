@@ -188,7 +188,7 @@ async def get_text_from_GPT(text: str) -> str:
             model="gpt-3.5-turbo",
             messages=[{
                 "role": "system",
-                "content": "Instructions for Output text:'Direct give me translated version of original without including any text like this 'NVC Language:' before' ,'try to limit the output length to original text only' ,'Be careful to distinguish pseudofeelings from feelings','.Rephrase the text that i will give in NVC Language "
+                "content": "Instructions for Output text:'Direct give me translated version of original without including any text like this 'NVC Language:' before' ,'try to limit the output length to original text only' ,'Be careful to distinguish pseudofeelings from feelings','.Only Rephrase the text that i will give in NVC Language "
             }, {
                 "role": "user",
                 "content": f"text is-'{text}'"
@@ -207,13 +207,11 @@ async def nvctranslator(full_text: str) -> tuple:
     Translates the provided text to NVC using GPT and divides it into tweets.
     """
     sentences = create_sentences(text=full_text)
-    logger.info(sentences)
     tasks = [
         asyncio.create_task(get_text_from_GPT(text=sentence))
         for sentence in sentences[:20]
     ]
     results = await asyncio.gather(*tasks)
-    logger.info(results)
     tweets = divide_into_tweets(sentences=results)
     return (tweets, sentences[20:], results)
 
@@ -232,7 +230,6 @@ async def reply_to_tweet(tweet_id: str, reply_text: str, username_who_posted: st
     """
     Replies to a tweet with the given text.
     """
-    logger.info(reply_text)
     try:
         intro_text = f"Here is @{username_who_posted}’s message in a form of non-violent communication:"
         # Initial tweet in reply to the specified tweet ID
@@ -293,9 +290,8 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
                         in_reply_to_user_text = in_reply_to_user_tweet_details['note_tweet']['text']
                     else:
                         in_reply_to_user_text = in_reply_to_user_tweet_details['text']
-                logger.info(in_reply_to_user_text)
+
                 in_reply_to_user_text = remove_urls(text=in_reply_to_user_text)
-                logger.info(in_reply_to_user_text)
                 userdetails_who_posted = next(
                     (user for user in tweet_data['mentions']['includes']['users'] if user['id'] == in_reply_to_user_id), None)
                 username_who_posted = None
@@ -326,7 +322,6 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
                 if (len(tweets_to_reply) == 0 or len(tweets_to_reply[0]) == 0 or tweets_to_reply == None):
                     logger.warning("No text recieved from NVC API")
                     return
-                logger.info(tweets_to_reply)
                 await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, username_who_posted=username_who_posted, repy_tweet_id=in_reply_to_tweet_id)
 
                 # code to store convert remaing text and store in database
