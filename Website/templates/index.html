@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Item Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-100">
+    <header class="text-white body-font bg-[#1D4ED8]">
+      <div
+        class="container mx-auto flex flex-wrap py-5 flex-col md:flex-row items-center justify-between"
+      >
+        <a
+          class="flex title-font font-medium items-center mb-4 md:mb-0"
+          href="/"
+        >
+          <img
+            src="../static/logo.jpg"
+            class="w-10 h-10 text-white rounded-full bg-white"
+            alt="logo"
+          />
+          <span class="ml-3 text-xl">NVC Translator</span>
+        </a>
+      </div>
+    </header>
+    <div class="container px-5 py-4 mx-auto">
+      <div class="flex flex-row text-center w-full items-center space-x-4 py-5">
+        <div>
+          <img
+            src="{{tweet['user']['profile_image_url'] | safe}}"
+            alt="logo"
+            class="w-14 h-14 rounded-full"
+          />
+        </div>
+        <a
+          class="flex flex-col items-start"
+          href="https://twitter.com/{{tweet['user']['username'] | safe}}"
+        >
+          <div class="font-semibold">{{tweet['user']['name'] | safe}}</div>
+          <div class="font-extralight">
+            @{{tweet['user']['username'] | safe}}
+          </div>
+        </a>
+      </div>
+      <div class="flex flex-col">
+        <h2 class="font-semibold mb-1 text-lg">Original tweet:</h2>
+        <div class="rounded-md bg-white px-8 py-8 font-normal shadow-md mb-4">
+          {{tweet['text'] | replace('\n', '<br />') | safe}}
+        </div>
+
+        <h2 class="mb-1 font-semibold mt-4 text-lg">Transalated tweet:</h2>
+        <div
+          id="translatedText"
+          class="rounded-md bg-white px-8 py-8 font-normal shadow-md"
+        >
+          {{translated_text | replace('\n', '<br />') | safe}}
+        </div>
+
+        <div class="text-center">
+          <button
+            type="button"
+            id="copyButton"
+            class="px-4 py-2 my-5 rounded-md bg-[#1D4ED8] text-white"
+          >
+            copy text
+          </button>
+        </div>
+        <!-- Notification Element (Initially Hidden) -->
+        <div
+          id="notification"
+          class="hidden fixed top-4 left-1/2 z-10 transform -translate-x-1/2 bg-blue-900 text-white py-2 px-4 rounded-lg"
+        >
+          Text Copied!
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    document
+      .getElementById("copyButton")
+      .addEventListener("click", function () {
+        navigator.clipboard
+          .writeText(document.getElementById("translatedText").innerText)
+          .then(() => {
+            // Show notification
+            let notification = document.getElementById("notification");
+            notification.classList.remove("hidden");
+
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+              notification.classList.add("hidden");
+            }, 3000); // 3000 milliseconds = 3 seconds
+          })
+          .catch((err) => console.error("Error copying text: ", err));
+      });
+  </script>
+</html>
