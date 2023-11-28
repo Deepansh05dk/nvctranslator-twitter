@@ -129,9 +129,6 @@ def remove_urls(text: str):
     url_pattern = re.compile(r'https?://\S+|www\.\S+')
     text = re.sub(url_pattern, '', text)
 
-    # Remove hashtags
-    hashtag_pattern = re.compile(r'#\S+')
-    text = re.sub(hashtag_pattern, '', text)
     return text
 
 
@@ -146,34 +143,34 @@ def create_sentences(text: str) -> list:
     return sentences
 
 
-def divide_into_tweets(sentences: list, max_length: int = 265) -> list:
+def divide_into_tweets(sentences: list, username_who_posted: str, max_length: int = 275, max_tweets: int = 5,) -> list:
     """
-    Divides a list of sentences into tweets, each not exceeding the max_length.
+    Divides a list of text into tweets, each not exceeding the max_length.
     """
     tweets = []
-    current_tweet = ""
-    index = 0
-    while (index < len(sentences)):
-        # Check if adding the next sentence would exceed the max_length
-        if len(current_tweet) + len(sentences[index]) + 1 > max_length:
-            # Add the current tweet to the tweets list
-            tweets.append(current_tweet)
-            if (len(tweets) == 5):
-                return tweets
-            # Start a new tweet
-            current_tweet = sentences[index]
-            if (sentences[index] != '\n'):
-                current_tweet += " "
+    current_tweet = f"Here is @{username_who_posted}’s message in a form of non-violent communication:\n"
+    for sentence in sentences:
+        if len(current_tweet) + len(sentence) + 1 <= max_length:
+            current_tweet += " " + \
+                sentence if (current_tweet and sentence != '\n') else sentence
         else:
-            # Add the sentences[index] to the current tweet, with space if not empty
-            current_tweet += sentences[index]
-            if (sentences[index] != '\n'):
-                current_tweet += " "
-        index += 1
+            words = nltk.word_tokenize(sentence)
+            for word in words:
+                if len(current_tweet) + len(word) + 1 <= max_length:
+                    current_tweet += " " + \
+                        word if (current_tweet and sentence != '\n') else word
+                else:
+                    tweets.append(current_tweet)
+                    current_tweet = word
+                    if len(tweets) == max_tweets:
+                        return tweets
 
-# Add the last tweet if it's not empty
-    if current_tweet:
+        if len(tweets) == max_tweets:
+            break
+
+    if current_tweet and len(tweets) < max_tweets:
         tweets.append(current_tweet)
+
     return tweets
 
 
@@ -181,28 +178,36 @@ async def get_text_from_GPT(text: str) -> str:
     """
     Retrieves text rephrased using GPT from OpenAI.
     """
-    if (text == '\n' or text == " " or text == "" or len(text) < 20):
+    if (text == '\n' or text == " " or text == "" or len(text) < 5):
         return text
     try:
+        prompt = f"""
+        Please Rephrase the following text into Nonviolent Communication (NVC) language. Ensure that the translation:
+        1. Is direct and does not include introductory phrases such as 'NVC Language:'
+        2. Has a length comparable to the original text.
+        3. DO translation word by word that is change only those words which require translation
+
+        Original Text:
+        "{text}"
+        """
         response = await OPENAI_CLIENT.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{
-                "role": "system",
-                "content": "Instructions for Output text:'Direct give me translated version of original without including any text like this 'NVC Language:' before' ,'try to limit the output length to original text only' ,'Be careful to distinguish pseudofeelings from feelings','.Only Rephrase the text that i will give in NVC Language "
-            }, {
                 "role": "user",
-                "content": f"text is-'{text}'"
+                "content": prompt
             }],
             temperature=0.1,
-            max_tokens=40
+            max_tokens=50
         )
-        return response.choices[0].message.content
+        if ("I'm sorry, but I am unable to translate the text" in response.choices[0].message.content):
+            return text
+        return response.choices[0].message.content.replace('"', '')
     except Exception as e:
         logger.error(f'Error in GPT processing: {e}')
         return ""
 
 
-async def nvctranslator(full_text: str) -> tuple:
+async def nvctranslator(full_text: str, username_who_posted: str) -> tuple:
     """
     Translates the provided text to NVC using GPT and divides it into tweets.
     """
@@ -212,7 +217,8 @@ async def nvctranslator(full_text: str) -> tuple:
         for sentence in sentences[:20]
     ]
     results = await asyncio.gather(*tasks)
-    tweets = divide_into_tweets(sentences=results)
+    tweets = divide_into_tweets(
+        sentences=results, username_who_posted=username_who_posted)
     return (tweets, sentences[20:], results)
 
 
@@ -226,17 +232,15 @@ async def handle_remaining_tweet_text(to_convert: list, converted: list, db, twe
     await insert_tweet(db, tweet_id, all_converted_text)
 
 
-async def reply_to_tweet(tweet_id: str, reply_text: str, username_who_posted: str, repy_tweet_id: str):
+async def reply_to_tweet(tweet_id: str, reply_text: str, repy_tweet_id: str):
     """
     Replies to a tweet with the given text.
     """
     try:
-        intro_text = f"Here is @{username_who_posted}’s message in a form of non-violent communication:"
-        # Initial tweet in reply to the specified tweet ID
+
         client = AsyncClient(bearer_token=env_vars['bearer_token'], consumer_key=env_vars['api_key'], consumer_secret=env_vars['api_secret'],
                              access_token=env_vars['access_token'], access_token_secret=env_vars['access_secret'])
-        status = await client.create_tweet(text=str(intro_text), in_reply_to_tweet_id=tweet_id)
-        tweet_id_to_reply = status[0]['id']
+        tweet_id_to_reply = tweet_id
         for i in range(0, len(reply_text)):
             tweet_reply_text = reply_text[i]
             status = await client.create_tweet(text=str(tweet_reply_text), in_reply_to_tweet_id=tweet_id_to_reply)
@@ -311,18 +315,18 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
                         "<<>>")
                     tweets_to_reply = divide_into_tweets(
                         sentences=translated_text)
-                    await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, username_who_posted=username_who_posted, repy_tweet_id=in_reply_to_tweet_id)
+                    await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, repy_tweet_id=in_reply_to_tweet_id)
                     return
 
                 # Your code to get translated text
                 tweets_to_reply, to_convert, converted = await nvctranslator(
-                    full_text=str(in_reply_to_user_text))
+                    full_text=str(in_reply_to_user_text), username_who_posted=username_who_posted)
 
                 # code to reply to the tweet
                 if (len(tweets_to_reply) == 0 or len(tweets_to_reply[0]) == 0 or tweets_to_reply == None):
                     logger.warning("No text recieved from NVC API")
                     return
-                await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, username_who_posted=username_who_posted, repy_tweet_id=in_reply_to_tweet_id)
+                await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, repy_tweet_id=in_reply_to_tweet_id)
 
                 # code to store convert remaing text and store in database
                 await handle_remaining_tweet_text(
