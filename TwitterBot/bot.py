@@ -302,10 +302,9 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
                 if (userdetails_who_posted):
                     username_who_posted = userdetails_who_posted['username']
 
-                if (username_who_posted == 'nvctranslator'):
-                    logger.warning("Can't reply back to nvctranslated tweet")
+                if (username_who_posted == 'nvctranslator' or '@nvctranslator' in in_reply_to_user_text):
+                    logger.warning("Can't reply back to tweet")
                     return
-
                 # check if tweet exist in database
                 tweet_from_database = await get_tweet_by_id(
                     tweet_id=in_reply_to_tweet_id, db=db)
