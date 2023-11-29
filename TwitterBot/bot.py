@@ -148,7 +148,7 @@ def divide_into_tweets(sentences: list, username_who_posted: str, max_length: in
     Divides a list of text into tweets, each not exceeding the max_length.
     """
     tweets = []
-    current_tweet = f"Here is @{username_who_posted}’s message in a form of non-violent communication:\n"
+    current_tweet = f"Here is @{username_who_posted}’s message in a form of non-violent communication:\n\n"
     for sentence in sentences:
         if len(current_tweet) + len(sentence) + 1 <= max_length:
             current_tweet += " " + \
