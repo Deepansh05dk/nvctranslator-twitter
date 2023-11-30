@@ -3,11 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NVCtranslate</title>
+    <title>NVC Translator</title>
     <link
-      rel="shortcut icon"
-      href="../static/images/logo.jpg"
-      type="image/x-icon"
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="../static/images/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../static/images/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../static/images/favicon-16x16.png"
     />
     <link rel="stylesheet" href="../static/css/style.css" />
   </head>
@@ -30,7 +42,7 @@
       </div>
     </header>
     <div class="container px-5 py-4 mx-auto">
-      <div class="flex flex-row text-center w-full items-center space-x-4 py-5">
+      <div class="flex flex-row w-full items-center space-x-4 py-5">
         <div>
           <img
             src="{{tweet['user']['profile_image_url'] | safe}}"
