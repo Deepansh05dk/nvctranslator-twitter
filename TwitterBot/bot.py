@@ -36,6 +36,7 @@ def load_env_variables():
 
 env_vars = load_env_variables()
 
+
 # Logger Setup
 
 
@@ -58,10 +59,11 @@ logger = setup_logger()
 # Configuration Constants
 DATABASE_NAME = "nvctranslator"
 COLLECTION_NAME = "tweets"
-OPENAI_CLIENT = AsyncOpenAI(api_key=os.environ['OPENAI'])
+OPENAI_CLIENT = AsyncOpenAI(api_key=env_vars['openai_key'])
 
 # Last Processed Time Setup
-last_processed_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+last_processed_time = (datetime.utcnow() -
+                       timedelta(seconds=11)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
 def get_last_processed_time():
@@ -132,6 +134,22 @@ def remove_urls(text: str):
     return text
 
 
+def remove_mentions_hashtags(text: str):
+    """
+    Remove mentions, and hashtags from the given text.
+    """
+
+    # Remove mentions (usernames)
+    mention_pattern = re.compile(r'@[\w]+')
+    text = re.sub(mention_pattern, '', text)
+
+    # Remove hashtags
+    hashtag_pattern = re.compile(r'#\w+')
+    text = re.sub(hashtag_pattern, '', text)
+
+    return text.strip()
+
+
 def create_sentences(text: str) -> list:
     """
     Splits the given text into sentences.
@@ -143,7 +161,7 @@ def create_sentences(text: str) -> list:
     return sentences
 
 
-def divide_into_tweets(sentences: list, username_who_posted: str, max_length: int = 275, max_tweets: int = 5,) -> list:
+def divide_into_tweets(sentences: list, username_who_posted: str, max_length: int = 275, max_tweets: int = 5) -> list:
     """
     Divides a list of text into tweets, each not exceeding the max_length.
     """
@@ -178,14 +196,15 @@ async def get_text_from_GPT(text: str) -> str:
     """
     Retrieves text rephrased using GPT from OpenAI.
     """
-    if (text == '\n' or text == " " or text == "" or len(text) < 5):
+    if (text == '\n' or text == " " or text == "" or len(text) < 5 or remove_mentions_hashtags(text) == ""):
         return text
     try:
         prompt = f"""
         Please Rephrase the following text into Nonviolent Communication (NVC) language. Ensure that the translation:
         1. Is direct and does not include introductory phrases such as 'NVC Language:'
         2. Has a length comparable to the original text.
-        3. DO translation word by word that is change only those words which require translation
+        3. DO translation word by word and change only those words which require translation.
+        4. Give output in same language as of input
 
         Original Text:
         "{text}"
@@ -232,7 +251,7 @@ async def handle_remaining_tweet_text(to_convert: list, converted: list, db, twe
     await insert_tweet(db, tweet_id, all_converted_text)
 
 
-async def reply_to_tweet(tweet_id: str, reply_text: str, repy_tweet_id: str):
+async def reply_to_tweet(tweet_id: str, reply_text: str, reply_tweet_id: str):
     """
     Replies to a tweet with the given text.
     """
@@ -248,7 +267,7 @@ async def reply_to_tweet(tweet_id: str, reply_text: str, repy_tweet_id: str):
 
         if (len(reply_text) >= 2):
             base_url = env_vars['host_url']
-            url_link = base_url+repy_tweet_id
+            url_link = base_url+reply_tweet_id
             final_text = f"Complete text available at {url_link}"
             await client.create_tweet(text=str(final_text), in_reply_to_tweet_id=tweet_id_to_reply)
 
@@ -269,6 +288,13 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
             # Get tweet details
             tweet_id = tweet_data['tweet']['id']
             tweet_created_at = tweet_data['tweet']['created_at']
+            tweet_author_id = tweet_data['tweet']['author_id']
+            tweet_username = next(
+                (user for user in tweet_data['latest_tweets']['includes']['users'] if user['id'] == tweet_author_id), None)['username']
+            if ('note_tweet' in tweet_data['tweet']):
+                tweet_text = tweet_data['tweet']['note_tweet']['text']
+            else:
+                tweet_text = tweet_data['tweet']['text']
 
             # Update the newest tweet time
             created_time = (datetime.strptime(
@@ -278,61 +304,87 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
             if (index == 0):
                 set_last_processed_time(created_time)
 
-             # Get tweet details
-            in_reply_to_tweet_id = None
-            if ('referenced_tweets' in tweet_data['tweet']):
-                in_reply_to_tweet_id = next(
-                    (ref_tweet['id'] for ref_tweet in tweet_data['tweet']['referenced_tweets'] if ref_tweet['type'] == 'replied_to'), None)
+            # handle tweet with  latest_tweets
+            if ('@nvctranslator' in tweet_text):
+                in_reply_to_tweet_id = None
+                if ('referenced_tweets' in tweet_data['tweet']):
+                    in_reply_to_tweet_id = next(
+                        (ref_tweet['id'] for ref_tweet in tweet_data['tweet']['referenced_tweets'] if ref_tweet['type'] == 'replied_to'), None)
 
-            if (in_reply_to_tweet_id):
-                # Get user details
-                in_reply_to_user_id = tweet_data['tweet']['in_reply_to_user_id']
-                in_reply_to_user_tweet_details = next(
-                    (one_tweet for one_tweet in tweet_data['mentions']['includes']['tweets'] if one_tweet['id'] == in_reply_to_tweet_id), None)
-                if (in_reply_to_user_tweet_details):
-                    if ('note_tweet' in in_reply_to_user_tweet_details):
-                        in_reply_to_user_text = in_reply_to_user_tweet_details['note_tweet']['text']
-                    else:
-                        in_reply_to_user_text = in_reply_to_user_tweet_details['text']
+                if (in_reply_to_tweet_id):
+                    # Get user details
+                    in_reply_to_user_id = tweet_data['tweet']['in_reply_to_user_id']
+                    in_reply_to_user_tweet_details = next(
+                        (one_tweet for one_tweet in tweet_data['latest_tweets']['includes']['tweets'] if one_tweet['id'] == in_reply_to_tweet_id), None)
+                    if (in_reply_to_user_tweet_details):
+                        if ('note_tweet' in in_reply_to_user_tweet_details):
+                            in_reply_to_user_text = in_reply_to_user_tweet_details['note_tweet']['text']
+                        else:
+                            in_reply_to_user_text = in_reply_to_user_tweet_details['text']
 
-                in_reply_to_user_text = remove_urls(text=in_reply_to_user_text)
-                userdetails_who_posted = next(
-                    (user for user in tweet_data['mentions']['includes']['users'] if user['id'] == in_reply_to_user_id), None)
-                username_who_posted = None
-                if (userdetails_who_posted):
-                    username_who_posted = userdetails_who_posted['username']
+                    in_reply_to_user_text = remove_urls(
+                        text=in_reply_to_user_text)
+                    userdetails_who_posted = next(
+                        (user for user in tweet_data['latest_tweets']['includes']['users'] if user['id'] == in_reply_to_user_id), None)
+                    username_who_posted = None
+                    if (userdetails_who_posted):
+                        username_who_posted = userdetails_who_posted['username']
 
-                if (username_who_posted == 'nvctranslator' or '@nvctranslator' in in_reply_to_user_text):
-                    logger.warning("Can't reply back to tweet")
-                    return
+                    if (username_who_posted == 'nvctranslator' or '@nvctranslator' in in_reply_to_user_text):
+                        logger.warning("Can't reply back to tweet")
+                        return
+
+                    # check if tweet exist in database
+                    tweet_from_database = await get_tweet_by_id(
+                        tweet_id=in_reply_to_tweet_id, db=db)
+                    if (tweet_from_database):
+                        logger.info("Tweet already translated")
+                        translated_text = tweet_from_database['translated_text'].split(
+                            "<<>>")
+                        tweets_to_reply = divide_into_tweets(
+                            sentences=translated_text, username_who_posted=username_who_posted)
+                        await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, reply_tweet_id=in_reply_to_tweet_id)
+                        return
+
+                    # Your code to get translated text
+                    tweets_to_reply, to_convert, converted = await nvctranslator(
+                        full_text=str(in_reply_to_user_text), username_who_posted=username_who_posted)
+
+                    # code to reply to the tweet
+                    if (len(tweets_to_reply) == 0 or len(tweets_to_reply[0]) == 0 or tweets_to_reply == None):
+                        logger.warning("No text recieved from NVC API")
+                        return
+                    await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, reply_tweet_id=in_reply_to_tweet_id)
+
+                    # code to store convert remaing text and store in database
+                    await handle_remaining_tweet_text(
+                        to_convert=to_convert, converted=converted, db=db, tweet_id=in_reply_to_tweet_id)
+
+                else:
+                    logger.warning('This tweet is not a reply')
+
+            # handle tweets other than latest_tweets
+            else:
                 # check if tweet exist in database
                 tweet_from_database = await get_tweet_by_id(
-                    tweet_id=in_reply_to_tweet_id, db=db)
+                    tweet_id=tweet_id, db=db)
                 if (tweet_from_database):
-                    logger.info("Tweet already translated")
-                    translated_text = tweet_from_database['translated_text'].split(
-                        "<<>>")
-                    tweets_to_reply = divide_into_tweets(
-                        sentences=translated_text)
-                    await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, repy_tweet_id=in_reply_to_tweet_id)
+                    logger.info("Tweet already replied")
                     return
 
                 # Your code to get translated text
                 tweets_to_reply, to_convert, converted = await nvctranslator(
-                    full_text=str(in_reply_to_user_text), username_who_posted=username_who_posted)
+                    full_text=str(remove_urls(tweet_text)), username_who_posted=tweet_username)
 
                 # code to reply to the tweet
                 if (len(tweets_to_reply) == 0 or len(tweets_to_reply[0]) == 0 or tweets_to_reply == None):
                     logger.warning("No text recieved from NVC API")
                     return
-                await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, repy_tweet_id=in_reply_to_tweet_id)
+                await reply_to_tweet(tweet_id=tweet_id, reply_text=tweets_to_reply, reply_tweet_id=tweet_id)
 
                 # code to store convert remaing text and store in database
                 await handle_remaining_tweet_text(
-                    to_convert=to_convert, converted=converted, db=db, tweet_id=in_reply_to_tweet_id)
-
-            else:
-                logger.warning('This tweet is not a reply')
+                    to_convert=to_convert, converted=converted, db=db, tweet_id=tweet_id)
 
         except Exception as e:
             logger.error(f"Error processing tweet {tweet_id}: {e}")
@@ -350,36 +402,46 @@ async def twitter_bot(db):
         client = AsyncClient(bearer_token=env_vars['bearer_token'], return_type=dict,
                              wait_on_rate_limit=True)
 
-        # Fetch mentions since the last processed tweet
-        logger.info("Fetching latest mentions tweets")
+        # Fetch latest tweets since the last processed tweet
+        logger.info("Fetching latest tweets")
 
-        mentions = await client.get_users_mentions(
-            id='1640149719447109633',
-            start_time=get_last_processed_time(),
+        query = "((NVC language) OR (\"Marshall Rosenberg\" OR \"Marshall Bertram Rosenberg\" OR \"Marshall B. Rosenberg\") OR ((nonviolent OR non-violent OR non violent) communication) -from:nvctranslator) OR " + \
+            "(@nvctranslator -from:nvctranslator -to:nvctranslator is:reply) OR " + \
+            "(from:elonmusk -is:reply -is:retweet -has:media) -is:retweet"
+
+        # Your Twitter API request
+        latest_tweets = await client.search_recent_tweets(
+            query=query,
             tweet_fields=["created_at", "author_id", "note_tweet"],
             expansions=["in_reply_to_user_id", "referenced_tweets.id",
                         'author_id', 'edit_history_tweet_ids'],
-            user_fields=["username"]
+            user_fields=["username"],
+            max_results=10,
+            start_time=get_last_processed_time(),
         )
-        if 'data' in mentions:
+
+        if 'data' in latest_tweets:
             semaphore = asyncio.Semaphore(50)
             tasks = [asyncio.create_task(handle_each_tweet(
-                tweet_data={'tweet': tweet, 'mentions': mentions}, index=index, semaphore=semaphore, db=db)) for index, tweet in enumerate(mentions['data'])]
+                tweet_data={'tweet': tweet, 'latest_tweets': latest_tweets}, index=index, semaphore=semaphore, db=db)) for index, tweet in enumerate(latest_tweets['data'])]
             await asyncio.gather(*tasks)
 
         else:
-            logger.warning('No mentions found')
+            logger.warning('No latest_tweets found')
 
     except Exception as e:
         logger.error(f"error in twitter bot function :-{e}")
 
 
 async def main():
-    db = await connect_to_mongodb()
-    while 1:
-        WAIT_TIME = 1.01  # min
-        await asyncio.gather(twitter_bot(db=db), asyncio.sleep(WAIT_TIME*60))
-
+    # db = await connect_to_mongodb()
+    # while 1:
+    #     WAIT_TIME = 16  # secs
+    #     await asyncio.gather(twitter_bot(db=db), asyncio.sleep(WAIT_TIME))
+    query = "((NVC language) OR (\"Marshall Rosenberg\" OR \"Marshall Bertram Rosenberg\" OR \"Marshall B. Rosenberg\") OR ((nonviolent OR non-violent OR non violent) communication) -from:nvctranslator) OR " + \
+            "(@nvctranslator -from:nvctranslator -to:nvctranslator is:reply) OR " + \
+            "(from:elonmusk -is:retweet -has:media) -is:retweet"
+    print(query)
 
 if __name__ == "__main__":
     asyncio.run(main())
