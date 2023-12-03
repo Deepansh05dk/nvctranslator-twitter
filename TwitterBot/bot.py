@@ -434,14 +434,11 @@ async def twitter_bot(db):
 
 
 async def main():
-    # db = await connect_to_mongodb()
-    # while 1:
-    #     WAIT_TIME = 16  # secs
-    #     await asyncio.gather(twitter_bot(db=db), asyncio.sleep(WAIT_TIME))
-    query = "((NVC language) OR (\"Marshall Rosenberg\" OR \"Marshall Bertram Rosenberg\" OR \"Marshall B. Rosenberg\") OR ((nonviolent OR non-violent OR non violent) communication) -from:nvctranslator) OR " + \
-            "(@nvctranslator -from:nvctranslator -to:nvctranslator is:reply) OR " + \
-            "(from:elonmusk -is:retweet -has:media) -is:retweet"
-    print(query)
+    db = await connect_to_mongodb()
+    while 1:
+        WAIT_TIME = 16  # secs
+        await asyncio.gather(twitter_bot(db=db), asyncio.sleep(WAIT_TIME))
+
 
 if __name__ == "__main__":
     asyncio.run(main())
