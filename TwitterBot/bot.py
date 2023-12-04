@@ -291,6 +291,10 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
             tweet_author_id = tweet_data['tweet']['author_id']
             tweet_username = next(
                 (user for user in tweet_data['latest_tweets']['includes']['users'] if user['id'] == tweet_author_id), None)['username']
+
+            if (tweet_username == 'nvctranslator'):
+                return
+
             if ('note_tweet' in tweet_data['tweet']):
                 tweet_text = tweet_data['tweet']['note_tweet']['text']
             else:
@@ -405,7 +409,7 @@ async def twitter_bot(db):
         # Fetch latest tweets since the last processed tweet
         logger.info("Fetching latest tweets")
 
-        query = "((NVC language) OR (\"Marshall Rosenberg\" OR \"Marshall Bertram Rosenberg\" OR \"Marshall B. Rosenberg\") OR ((nonviolent OR non-violent OR non violent) communication) -from:nvctranslator -is:retweet) OR " + \
+        query = "((NVC language) OR (\"Marshall Rosenberg\" OR \"Marshall Bertram Rosenberg\" OR \"Marshall B. Rosenberg\") OR ((nonviolent OR non-violent OR non violent) communication) -from:nvctranslator -to:nvctranslator -is:retweet) OR " + \
             "(@nvctranslator -from:nvctranslator -to:nvctranslator is:reply -is:retweet) OR " + \
             "(from:elonmusk -is:retweet -has:media)"
 
