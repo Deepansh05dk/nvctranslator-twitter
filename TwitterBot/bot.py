@@ -405,9 +405,9 @@ async def twitter_bot(db):
         # Fetch latest tweets since the last processed tweet
         logger.info("Fetching latest tweets")
 
-        query = "((NVC language) OR (\"Marshall Rosenberg\" OR \"Marshall Bertram Rosenberg\" OR \"Marshall B. Rosenberg\") OR ((nonviolent OR non-violent OR non violent) communication) -from:nvctranslator) OR " + \
-            "(@nvctranslator -from:nvctranslator -to:nvctranslator is:reply) OR " + \
-            "(from:elonmusk -is:reply -is:retweet -has:media) -is:retweet"
+        query = "((NVC language) OR (\"Marshall Rosenberg\" OR \"Marshall Bertram Rosenberg\" OR \"Marshall B. Rosenberg\") OR ((nonviolent OR non-violent OR non violent) communication) -from:nvctranslator -is:retweet) OR " + \
+            "(@nvctranslator -from:nvctranslator -to:nvctranslator is:reply -is:retweet) OR " + \
+            "(from:elonmusk -is:reply -is:retweet -has:media)"
 
         # Your Twitter API request
         latest_tweets = await client.search_recent_tweets(
