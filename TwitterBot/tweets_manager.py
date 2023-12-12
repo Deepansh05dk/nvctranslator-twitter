@@ -17,10 +17,10 @@ last_processed_time = (datetime.utcnow() -
 Tweepy_clients = {
     "@nvctranslator": AsyncClient(consumer_key=os.environ['NVC_CONSUMER_KEY'], consumer_secret=os.environ['NVC_CONSUMER_SECRET'], access_token=os.environ['NVC_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['NVC_ACCESS_TOKEN_SECRET']),
     "@eli5translator": AsyncClient(consumer_key=os.environ['ELI5_CONSUMER_KEY'], consumer_secret=os.environ['ELI5_CONSUMER_SECRET'], access_token=os.environ['ELI5_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ELI5_ACCESS_TOKEN_SECRET']),
-    "@adulttranslator": AsyncClient(consumer_key=os.environ['ADULT_CONSUMER_KEY'], consumer_secret=os.environ['ADULT_CONSUMER_SECRET'], access_token=os.environ['ADULT_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ADULT_ACCESS_TOKEN_SECRET'])
+    "@adulttranslate": AsyncClient(consumer_key=os.environ['ADULT_CONSUMER_KEY'], consumer_secret=os.environ['ADULT_CONSUMER_SECRET'], access_token=os.environ['ADULT_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ADULT_ACCESS_TOKEN_SECRET'])
 }
 
-Bots_list = ["@nvctranslator", "@eli5translator", "@adulttranslator"]
+Bots_list = ["@nvctranslator", "@eli5translator", "@adulttranslate"]
 
 
 def get_intro_for_the_tweet(username: str, mention: str):
@@ -30,7 +30,7 @@ def get_intro_for_the_tweet(username: str, mention: str):
             intro = f"Here's a translation of @{username}’s message using Nonviolent Communication principles:"
         case "@eli5translator":
             intro = f"Here is @{username}’s message explained like a 5-year-old would understand:"
-        case "@adulttranslator":
+        case "@adulttranslate":
             intro = f"To align with adult communication norms, here is @{username}’s message conveyed in a more formal manner:"
 
     return intro

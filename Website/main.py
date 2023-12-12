@@ -87,17 +87,17 @@ async def read_item(request: Request, status_id: str):
         return templates.TemplateResponse("not_found.html", {"request": request})
 
 
-@app.get("/adulttranslator/{status_id}", response_class=HTMLResponse)
+@app.get("/adulttranslate/{status_id}", response_class=HTMLResponse)
 async def read_item(request: Request, status_id: str):
     if db != None:
         tweet_from_database = await get_tweet_by_id(
-            tweet_id=status_id, db=db, database='eli5translator')
+            tweet_id=status_id, db=db, database='adulttranslate')
         if (tweet_from_database == None):
-            return templates.TemplateResponse("not_found.html", {"request": request, "theme_colour": "#86f7ee", "bot": 'ELI5Translator', "logo": "../static/logos/eli5translator.png"})
+            return templates.TemplateResponse("not_found.html", {"request": request, "theme_colour": "#86f7ee", "bot": 'ADULTTranslator', "logo": "../static/logos/eli5translator.png"})
         translated_text = " ".join(
             tweet_from_database['translated_text'].split("<<>>"))
         original_text = tweet_from_database['original_text']
         user_details = tweet_from_database['userdetails_who_posted']
-        return templates.TemplateResponse("index.html", {"request": request, "original_text": original_text, "translated_text": translated_text, "user_details": user_details, "theme_colour": "#86f7ee", "bot": 'ELI5Translator', "logo": "../static/logos/eli5translator.png"})
+        return templates.TemplateResponse("index.html", {"request": request, "original_text": original_text, "translated_text": translated_text, "user_details": user_details, "theme_colour": "#86f7ee", "bot": 'ADULTTranslator', "logo": "../static/logos/eli5translator.png"})
     else:
         return templates.TemplateResponse("not_found.html", {"request": request})
