@@ -12,20 +12,28 @@ import re
 
 load_dotenv()
 
-Tweepy_clients = {
-    "@nvctranslator": AsyncClient(consumer_key=os.environ['NVC_CONSUMER_KEY'], consumer_secret=os.environ['NVC_CONSUMER_SECRET'], access_token=os.environ['NVC_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['NVC_ACCESS_TOKEN_SECRET']),
-    "@eli5translator": AsyncClient(consumer_key=os.environ['ELI5_CONSUMER_KEY'], consumer_secret=os.environ['ELI5_CONSUMER_SECRET'], access_token=os.environ['ELI5_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ELI5_ACCESS_TOKEN_SECRET'])
-}
-
-Bots_list = ["@nvctranslator", "@eli5translator"]
-
-first_tweet_sentence = {
-    "@nvctranslator": "in a form of non-violent communication:",
-    "@eli5translator": "explained like a 5-year-old would understand:"
-}
-
 last_processed_time = (datetime.utcnow() -
                        timedelta(seconds=11)).strftime('%Y-%m-%dT%H:%M:%SZ')
+Tweepy_clients = {
+    "@nvctranslator": AsyncClient(consumer_key=os.environ['NVC_CONSUMER_KEY'], consumer_secret=os.environ['NVC_CONSUMER_SECRET'], access_token=os.environ['NVC_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['NVC_ACCESS_TOKEN_SECRET']),
+    "@eli5translator": AsyncClient(consumer_key=os.environ['ELI5_CONSUMER_KEY'], consumer_secret=os.environ['ELI5_CONSUMER_SECRET'], access_token=os.environ['ELI5_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ELI5_ACCESS_TOKEN_SECRET']),
+    "@adulttranslator": AsyncClient(consumer_key=os.environ['ADULT_CONSUMER_KEY'], consumer_secret=os.environ['ADULT_CONSUMER_SECRET'], access_token=os.environ['ADULT_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ADULT_ACCESS_TOKEN_SECRET'])
+}
+
+Bots_list = ["@nvctranslator", "@eli5translator", "@adulttranslator"]
+
+
+def get_intro_for_the_tweet(username: str, mention: str):
+    """Get a introduction for the tweet"""
+    match mention:
+        case "@nvctranslator":
+            intro = f"Here's a translation of @{username}’s message using Nonviolent Communication principles:"
+        case "@eli5translator":
+            intro = f"Here is @{username}’s message explained like a 5-year-old would understand:"
+        case "@adulttranslator":
+            intro = f"To align with adult communication norms, here is @{username}’s message conveyed in a more formal manner:"
+
+    return intro
 
 
 def get_last_processed_time():
@@ -57,7 +65,8 @@ def divide_into_tweets(sentences: list, username_who_posted: str, mention: str, 
     Divides a list of text into tweets, each not exceeding the max_length.
     """
     tweets = []
-    current_tweet = f"Here is @{username_who_posted}’s message {first_tweet_sentence[mention]}\n\n"
+    current_tweet = get_intro_for_the_tweet(
+        mention=mention, username=username_who_posted)+"\n\n"
     for sentence in sentences:
         if len(current_tweet) + len(sentence) + 1 <= max_length:
             current_tweet += " " + \
@@ -85,7 +94,7 @@ def divide_into_tweets(sentences: list, username_who_posted: str, mention: str, 
     if (len(tweets) == 2):
         tweets[0] = ' 1/3 ' + tweets[0]
         tweets[1] = ' 2/3 ' + tweets[1]
-        base_url = os.environ['HOST_URL']
+        base_url = os.environ['HOST_URL'] + mention[1:]+'/'
         url_link = base_url+tweet_id
         tweets.append(
             f"3/3 Complete text available at {url_link}"
@@ -131,14 +140,14 @@ async def reply_to_tweet(tweet_id: str, reply_text: list[str], client_type: str)
         logging.error(f"Error replying to tweet {tweet_id}: {e}")
 
 
-async def handle_remaining_tweet_text(to_convert: list, converted: list, db, tweet_id: str, mention: str):
+async def handle_remaining_tweet_text(to_convert: list, converted: list, db, tweet_id: str, mention: str, userdetails_who_posted: dict, original_text: str):
     """
     Handles the remaining text for conversion and inserts into the database.
     """
     all_converted_text = converted + await asyncio.gather(
         *[asyncio.create_task(get_text_from_GPT(text, prompt_type=mention)) for text in to_convert]
     )
-    await insert_tweet(db, tweet_id, all_converted_text, mention=mention)
+    await insert_tweet(db, tweet_id, all_converted_text, userdetails_who_posted=userdetails_who_posted, mention=mention, original_text=original_text)
 
 
 async def handle_each_mention(mention: str, params: dict):
@@ -153,13 +162,13 @@ async def handle_each_mention(mention: str, params: dict):
         translated_text = tweet_from_database['translated_text'].split(
             "<<>>")
         tweets_to_reply = divide_into_tweets(
-            sentences=translated_text, username_who_posted=params['username_who_posted'], mention=mention, tweet_id=params['in_reply_to_tweet_id'])
+            sentences=translated_text, username_who_posted=params['userdetails_who_posted']['username'], mention=mention, tweet_id=params['in_reply_to_tweet_id'])
         await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=tweets_to_reply, client_type=mention)
         return
 
     # Your code to get translated text
     tweets_to_reply, to_convert, converted = await translator(
-        full_text=str(params['in_reply_to_user_text']), username_who_posted=params['username_who_posted'], mention=mention, tweet_id=params['in_reply_to_tweet_id'])
+        full_text=str(params['in_reply_to_user_text']), username_who_posted=params['userdetails_who_posted']['username'], mention=mention, tweet_id=params['in_reply_to_tweet_id'])
 
     # code to reply to the tweet
     if (len(tweets_to_reply) == 0 or len(tweets_to_reply[0]) == 0 or tweets_to_reply == None):
@@ -169,7 +178,7 @@ async def handle_each_mention(mention: str, params: dict):
 
     # code to store convert remaing text and store in database
     await handle_remaining_tweet_text(
-        to_convert=to_convert, converted=converted, db=params['db'], tweet_id=params['in_reply_to_tweet_id'], mention=mention)
+        to_convert=to_convert, converted=converted, db=params['db'], tweet_id=params['in_reply_to_tweet_id'], mention=mention, userdetails_who_posted=params['userdetails_who_posted'], original_text=params['in_reply_to_user_text'])
 
 
 async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, index: int, db):
@@ -217,9 +226,6 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
                     text=in_reply_to_user_text)
                 userdetails_who_posted = next(
                     (user for user in tweet_data['latest_tweets']['includes']['users'] if user['id'] == in_reply_to_user_id), None)
-                username_who_posted = None
-                if (userdetails_who_posted):
-                    username_who_posted = userdetails_who_posted['username']
 
                 if any(mention in set(extract_mentions(text=in_reply_to_user_text)) for mention in Bots_list):
                     logging.error("Can't reply back")
@@ -228,7 +234,7 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
                 for mention in extract_mentions(text=tweet_text):
                     if (mention in Bots_list):
                         tasks.append(handle_each_mention(mention=mention, params={'in_reply_to_tweet_id': in_reply_to_tweet_id, 'db': db,
-                                                                                  'in_reply_to_user_text': in_reply_to_user_text, 'tweet_id': tweet_id, 'username_who_posted': username_who_posted}))
+                                                                                  'in_reply_to_user_text': in_reply_to_user_text, 'tweet_id': tweet_id, 'userdetails_who_posted': userdetails_who_posted}))
                 await asyncio.gather(*tasks)
             else:
                 logging.warning('This tweet is not a reply')

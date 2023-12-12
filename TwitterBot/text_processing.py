@@ -13,7 +13,8 @@ OPENAI_CLIENT = AsyncOpenAI(api_key=os.getenv('OPENAI'))
 
 prompts = {
     "@nvctranslator": "Translate into simple Nonviolent Communication (NVC) language ",
-    "@eli5translator": "Explain Like I'm 5 year old"
+    "@eli5translator": "Explain Like I'm 5 year old",
+    "@adulttranslator": "Tailor the text to sound more 'adult-like', perhaps by refining slang or casual language into simple formal English"
 }
 
 

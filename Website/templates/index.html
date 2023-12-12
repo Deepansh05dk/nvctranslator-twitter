@@ -3,60 +3,44 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NVC Translator</title>
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="../static/images/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="../static/images/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="../static/images/favicon-16x16.png"
-    />
+    <title>{{bot}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="{{logo}}" type="image/x-icon" />
     <link rel="stylesheet" href="../static/css/style.css" />
   </head>
   <body class="bg-slate-100">
-    <header class="text-white body-font bg-[#1D4ED8]">
+    <header class="text-white body-font bg-[{{theme_colour}}]">
       <div
         class="container mx-auto flex flex-wrap py-5 flex-col md:flex-row items-center justify-between px-4"
       >
-        <a
-          class="flex title-font font-medium items-center mb-4 md:mb-0"
-          href="/"
-        >
+        <a class="flex title-font font-bold items-center mb-4 md:mb-0" href="/">
           <img
-            src="../static/images/logo.jpg"
+            src="{{logo}}"
             class="w-10 h-10 text-white rounded-full bg-white"
             alt="logo"
           />
-          <span class="ml-3 text-xl">NVC Translator</span>
+          <span class="ml-3 text-xl">{{bot}}</span>
         </a>
       </div>
     </header>
-    <div class="container px-5 py-4 mx-auto">
+    <div class="container px-5 py-4 md:py-7 mx-auto">
       <div class="flex flex-row w-full items-center space-x-4 py-5">
         <div>
           <img
-            src="{{tweet['user']['profile_image_url'] | safe}}"
+            src="{{user_details['profile_image_url'] | safe}}"
             alt="logo"
             class="w-14 h-14 rounded-full"
           />
         </div>
         <a
           class="flex flex-col items-start"
-          href="https://twitter.com/{{tweet['user']['username'] | safe}}"
+          href="https://twitter.com/{{user_details['username'] | safe}}"
         >
-          <div class="font-semibold">{{tweet['user']['name'] | safe}}</div>
-          <div class="font-extralight">
-            @{{tweet['user']['username'] | safe}}
+          <div class="font-semibold text-lg">
+            {{user_details['name'] | safe}}
+          </div>
+          <div class="font-extralight text-sm">
+            @{{user_details['username'] | safe}}
           </div>
         </a>
       </div>
@@ -76,7 +60,7 @@
               <button
                 type="button"
                 id="btnTranslated"
-                class="inline-block rounded-md bg-[#1D4ED8] px-4 py-2 text-sm text-white shadow-sm focus:relative"
+                class="inline-block font-medium rounded-md bg-[{{theme_colour}}] px-4 py-2 text-sm text-white shadow-sm focus:relative"
               >
                 Translated
               </button>
@@ -84,7 +68,7 @@
               <button
                 type="button"
                 id="btnOriginal"
-                class="inline-block rounded-md px-4 py-2 text-sm text-gray-500 hover:text-gray-700 focus:relative"
+                class="inline-block font-medium rounded-md px-4 py-2 text-sm text-gray-500 hover:text-gray-700 focus:relative"
               >
                 Original
               </button>
@@ -95,15 +79,15 @@
             <button
               type="button"
               id="copyButton"
-              class="px-4 py-2 my-5 rounded-md bg-[#1D4ED8] text-white"
+              class="px-4 py-2 my-5 font-medium rounded-md bg-[{{theme_colour}}] text-white"
             >
-              copy text
+              Copy
             </button>
           </div>
         </div>
         <div
           id="notification"
-          class="hidden fixed top-4 left-1/2 z-10 transform -translate-x-1/2 bg-blue-900 text-white py-2 px-4 rounded-lg"
+          class="hidden fixed top-4 left-1/2 z-10 transform -translate-x-1/2 bg-blue-950 text-white py-2 px-4 rounded-lg"
         >
           Text Copied!
         </div>
@@ -136,9 +120,9 @@
     btnTranslated.addEventListener("click", function () {
       // Update classes
       btnTranslated.className =
-        "inline-block rounded-md bg-[#1D4ED8] px-4 py-2 text-sm text-white shadow-sm focus:relative";
+        "inline-block rounded-md font-medium bg-[{{theme_colour}}] px-4 py-2 text-sm text-white shadow-sm focus:relative";
       btnOriginal.className =
-        "inline-block rounded-md px-4 py-2 text-sm text-gray-500 hover:text-gray-700 focus:relative";
+        "inline-block rounded-md font-medium px-4 py-2 text-sm text-gray-500 hover:text-gray-700 focus:relative";
 
       // Update textBox HTML
       textBox.innerHTML = `{{translated_text | replace('\n', '<br />') | safe}}`;
@@ -147,12 +131,12 @@
     btnOriginal.addEventListener("click", function () {
       // Update classes
       btnOriginal.className =
-        "inline-block rounded-md bg-[#1D4ED8] px-4 py-2 text-sm text-white shadow-sm focus:relative";
+        "inline-block rounded-md font-medium bg-[{{theme_colour}}] px-4 py-2 text-sm text-white shadow-sm focus:relative";
       btnTranslated.className =
-        "inline-block rounded-md px-4 py-2 text-sm text-gray-500 hover:text-gray-700 focus:relative";
+        "inline-block rounded-md font-medium px-4 py-2 text-sm text-gray-500 hover:text-gray-700 focus:relative";
 
       // Update textBox HTML
-      textBox.innerHTML = `{{tweet['text'] | replace('\n', '<br />') | safe}}`;
+      textBox.innerHTML = `{{original_text | replace('\n', '<br />') | safe}}`;
     });
   </script>
 </html>

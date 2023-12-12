@@ -3,28 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NVC Translator</title>
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="../static/images/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="../static/images/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="../static/images/favicon-16x16.png"
-    />
+    <title>{{bot}}</title>
+    <link rel="shortcut icon" href="{{logo}}" type="image/x-icon" />
     <link rel="stylesheet" href="../static/css/style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-slate-100">
-    <header class="text-white body-font bg-[#1D4ED8]">
+    <header class="text-white body-font bg-[{{theme_colour}}]">
       <div
         class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center justify-between"
       >
@@ -33,23 +18,19 @@
           href="/"
         >
           <img
-            src="../static/images/logo.jpg"
+            src="{{logo}}"
             class="w-10 h-10 text-white rounded-full bg-white"
             alt="logo"
           />
-          <span class="ml-3 text-xl">NVC Translator</span>
+          <span class="ml-3 text-xl">{{bot}}</span>
         </a>
       </div>
     </header>
     <div class="container px-5 py-10 mx-auto">
-      <div class="rounded-md bg-white px-8 py-8 font-normal shadow-md">
-        Sorry, we couldn't find the tweet. You can attempt to visit
-        <a
-          class="font-semibold text-blue-500"
-          href="https://www.nvctranslator.com/"
-          >NVCtranslator</a
-        >
-        for NVC translations
+      <div
+        class="rounded-md bg-white px-8 py-8 font-medium shadow-md text-center"
+      >
+        The requested tweet might be deleted or unavailable.
       </div>
     </div>
   </body>
