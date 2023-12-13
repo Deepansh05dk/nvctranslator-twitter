@@ -127,7 +127,6 @@ async def reply_to_tweet(tweet_id: str, reply_text: list[str], client_type: str)
     Replies to a tweet with the given text.
     """
     try:
-        logging.info(reply_text)
         client = Tweepy_clients[client_type]
         tweet_id_to_reply = tweet_id
         for i in range(0, len(reply_text)):
