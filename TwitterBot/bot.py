@@ -1,4 +1,3 @@
-
 from db_operations import connect_to_mongodb
 from tweets_manager import handle_each_tweet, get_last_processed_time, last_processed_time
 from dotenv import load_dotenv
@@ -10,8 +9,6 @@ from nltk import download as nltk_download
 nltk_download('punkt')
 
 load_dotenv()
-
-# Logger Setup
 
 
 def setup_logger():
@@ -29,16 +26,15 @@ def setup_logger():
 
 
 logger = setup_logger()
-# Last Processed Time Setup
 
 
-async def twitter_bot(db):
+async def twitter_bots(db):
     """
     Main function to run the Twitter bot.
     """
     global last_processed_time
     try:
-        logger.info("Twitter bot started")
+        logger.info("Twitter bots started")
 
         # Initialize Tweepy Client
         client = AsyncClient(bearer_token=os.getenv("BEARER_TOKEN"), return_type=dict,
@@ -47,7 +43,7 @@ async def twitter_bot(db):
         # Fetch latest tweets since the last processed tweet
         logger.info("Fetching latest tweets")
 
-        query = "(@nvctranslator OR @eli5translator OR @adulttranslate) is:reply -is:retweet -is:quote -from:nvctranslator -to:nvctranslator -from:eli5translator -to:eli5translator -from:adulttranslate -to:adulttranslate"
+        query = "(@nvctranslator OR @eli5translator OR @adulttranslate OR @makethismature) is:reply -is:retweet -is:quote -from:nvctranslator -to:nvctranslator -from:eli5translator -to:eli5translator -from:adulttranslate -to:adulttranslate -from:makethismature -to:makethismature"
 
         # Your Twitter API request
         latest_tweets = await client.search_recent_tweets(
@@ -56,12 +52,12 @@ async def twitter_bot(db):
             expansions=["in_reply_to_user_id", "referenced_tweets.id",
                         'author_id'],
             user_fields=['username', 'name', 'profile_image_url'],
-            max_results=10,
+            max_results=50,
             start_time=get_last_processed_time(),
         )
 
         if 'data' in latest_tweets:
-            semaphore = asyncio.Semaphore(50)
+            semaphore = asyncio.Semaphore(25)
             tasks = [asyncio.create_task(handle_each_tweet(
                 tweet_data={'tweet': tweet, 'latest_tweets': latest_tweets}, index=index, semaphore=semaphore, db=db)) for index, tweet in enumerate(latest_tweets['data'])]
             await asyncio.gather(*tasks)
@@ -77,7 +73,7 @@ async def main():
     db = await connect_to_mongodb()
     while 1:
         WAIT_TIME = 16  # secs
-        await asyncio.gather(twitter_bot(db=db), asyncio.sleep(WAIT_TIME))
+        await asyncio.gather(twitter_bots(db=db), asyncio.sleep(WAIT_TIME))
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -9,14 +9,6 @@ import motor.motor_asyncio
 import logging
 
 load_dotenv()
-# Create a logger
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    format='[%(asctime)s] [%(levelname)s]   %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S',
-    force=True)
-
 # fastapi app configurations
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="./static"), name="static")
@@ -50,23 +42,18 @@ def remove_urls(text: str):
     return re.sub(url_pattern, '', text)
 
 
-# @app.get("/", response_class=RedirectResponse)
-# async def read_root():
-#     return RedirectResponse(url='https://nvcthis.com/')
-
-
 @app.get("/nvctranslator/{status_id}", response_class=HTMLResponse)
 async def read_item(request: Request, status_id: str):
     if db != None:
         tweet_from_database = await get_tweet_by_id(
             tweet_id=status_id, db=db, database='nvctranslator')
         if (tweet_from_database == None):
-            return templates.TemplateResponse("not_found.html", {"request": request, "theme_colour": "#fbbf24", "bot": 'NVCTranslator', "logo": "../static/logos/nvctranslator.jpg"})
+            return templates.TemplateResponse("not_found.html", {"request": request, "theme_colour": "#fbbf24", "bot": 'NVCTranslator', "logo": "../static/logos/nvctranslator.jpg", "mention": "nvctranslator"})
         translated_text = " ".join(
             tweet_from_database['translated_text'].split("<<>>"))
         original_text = tweet_from_database['original_text']
         user_details = tweet_from_database['userdetails_who_posted']
-        return templates.TemplateResponse("index.html", {"request": request, "original_text": original_text, "translated_text": translated_text, "user_details": user_details, "theme_colour": "#fbbf24", "bot": 'NVCTranslator', "logo": "../static/logos/nvctranslator.jpg"})
+        return templates.TemplateResponse("index.html", {"request": request, "original_text": original_text, "translated_text": translated_text, "user_details": user_details, "theme_colour": "#fbbf24", "bot": 'NVCTranslator', "logo": "../static/logos/nvctranslator.jpg", "mention": "nvctranslator"})
     else:
         return templates.TemplateResponse("not_found.html", {"request": request})
 
@@ -77,12 +64,12 @@ async def read_item(request: Request, status_id: str):
         tweet_from_database = await get_tweet_by_id(
             tweet_id=status_id, db=db, database='eli5translator')
         if (tweet_from_database == None):
-            return templates.TemplateResponse("not_found.html", {"request": request, "theme_colour": "#86f7ee", "bot": 'ELI5Translator', "logo": "../static/logos/eli5translator.png"})
+            return templates.TemplateResponse("not_found.html", {"request": request, "theme_colour": "#68baa2", "bot": 'ELI5Translator', "logo": "../static/logos/eli5translator.png", "mention": "eli5translator"})
         translated_text = " ".join(
             tweet_from_database['translated_text'].split("<<>>"))
         original_text = tweet_from_database['original_text']
         user_details = tweet_from_database['userdetails_who_posted']
-        return templates.TemplateResponse("index.html", {"request": request, "original_text": original_text, "translated_text": translated_text, "user_details": user_details, "theme_colour": "#86f7ee", "bot": 'ELI5Translator', "logo": "../static/logos/eli5translator.png"})
+        return templates.TemplateResponse("index.html", {"request": request, "original_text": original_text, "translated_text": translated_text, "user_details": user_details, "theme_colour": "#68baa2", "bot": 'ELI5Translator', "logo": "../static/logos/eli5translator.png", "mention": "eli5translator"})
     else:
         return templates.TemplateResponse("not_found.html", {"request": request})
 
@@ -93,11 +80,27 @@ async def read_item(request: Request, status_id: str):
         tweet_from_database = await get_tweet_by_id(
             tweet_id=status_id, db=db, database='adulttranslate')
         if (tweet_from_database == None):
-            return templates.TemplateResponse("not_found.html", {"request": request, "theme_colour": "#86f7ee", "bot": 'ADULTTranslator', "logo": "../static/logos/eli5translator.png"})
+            return templates.TemplateResponse("not_found.html", {"request": request, "theme_colour": "#29558d", "bot": 'AdultTranslator', "logo": "../static/logos/adulttranslate.png", "mention": "adulttranslate"})
         translated_text = " ".join(
             tweet_from_database['translated_text'].split("<<>>"))
         original_text = tweet_from_database['original_text']
         user_details = tweet_from_database['userdetails_who_posted']
-        return templates.TemplateResponse("index.html", {"request": request, "original_text": original_text, "translated_text": translated_text, "user_details": user_details, "theme_colour": "#86f7ee", "bot": 'ADULTTranslator', "logo": "../static/logos/eli5translator.png"})
+        return templates.TemplateResponse("index.html", {"request": request, "original_text": original_text, "translated_text": translated_text, "user_details": user_details, "theme_colour": "#29558d", "bot": 'AdultTranslator', "logo": "../static/logos/adulttranslate.png", "mention": "adulttranslate"})
+    else:
+        return templates.TemplateResponse("not_found.html", {"request": request})
+
+
+@app.get("/makethismature/{status_id}", response_class=HTMLResponse)
+async def read_item(request: Request, status_id: str):
+    if db != None:
+        tweet_from_database = await get_tweet_by_id(
+            tweet_id=status_id, db=db, database='makethismature')
+        if (tweet_from_database == None):
+            return templates.TemplateResponse("not_found.html", {"request": request, "theme_colour": "#ab551f", "bot": 'MakeThisMature', "logo": "../static/logos/makethismature.png", "mention": "makethismature"})
+        translated_text = " ".join(
+            tweet_from_database['translated_text'].split("<<>>"))
+        original_text = tweet_from_database['original_text']
+        user_details = tweet_from_database['userdetails_who_posted']
+        return templates.TemplateResponse("index.html", {"request": request, "original_text": original_text, "translated_text": translated_text, "user_details": user_details, "theme_colour": "#ab551f", "bot": 'MakeThisMature', "logo": "../static/logos/makethismature.png", "mention": "makethismature"})
     else:
         return templates.TemplateResponse("not_found.html", {"request": request})

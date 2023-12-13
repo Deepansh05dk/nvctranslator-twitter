@@ -9,7 +9,8 @@ load_dotenv()
 mongo_url = os.getenv('MONGOURL')
 DATABASE_NAMES = {"@nvctranslator": "nvctranslator",
                   "@eli5translator": "eli5translator",
-                  "@adulttranslate": "adulttranslate"}
+                  "@adulttranslate": "adulttranslate",
+                  "@makethismature": "makethismature"}
 COLLECTION_NAME = "tweets"
 
 

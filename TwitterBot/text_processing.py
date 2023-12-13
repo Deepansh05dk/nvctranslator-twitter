@@ -14,7 +14,8 @@ OPENAI_CLIENT = AsyncOpenAI(api_key=os.getenv('OPENAI'))
 prompts = {
     "@nvctranslator": "Translate into simple Nonviolent Communication (NVC) language ",
     "@eli5translator": "Explain Like I'm 5 year old",
-    "@adulttranslate": "Tailor the text to sound more 'adult-like', perhaps by refining slang or casual language into simple formal English"
+    "@adulttranslate": "Tailor the text to sound more 'adult-like', perhaps by refining slang or casual language into simple formal English",
+    "@makethismature": "Converts immature or simplistic language in text into a more sophisticated and mature form, perhaps for professional or academic use"
 }
 
 
@@ -74,8 +75,7 @@ async def get_text_from_GPT(text: str, prompt_type: str) -> str:
                 "role": "user",
                 "content": prompt
             }],
-            temperature=0.1,
-            max_tokens=50
+            temperature=0.1
         )
         return response.choices[0].message.content.replace('"', '')
     except Exception as e:
