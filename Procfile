@@ -1,2 +1,2 @@
-web: uvicorn Website.main:app --host=0.0.0.0 --port=${PORT:-5000}
+web: cd website && npm start
 worker: python TwitterBot/bot.py
