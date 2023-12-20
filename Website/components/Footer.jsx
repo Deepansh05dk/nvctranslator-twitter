@@ -5,7 +5,7 @@ import Link from "next/link";
 const Footer = () => {
   return (
     <footer className="bg-[#316382] text-white ">
-      <div className="mx-auto max-w-screen-xl px-2 py-4 sm:py-6 sm:px-4 lg:px-8">
+      <div className="mx-auto max-w-screen-xl px-2 py-4 sm:px-4 lg:px-8">
         <div className="sm:flex sm:items-center sm:justify-between">
           <div className="flex-row space-x-10 flex items-center justify-center">
             <div className="font-medium text-center">
@@ -18,7 +18,7 @@ const Footer = () => {
               />{" "}
               XAICompanions
             </div>
-            <Link className="mr-10" href="/privacy-policy">
+            <Link className="mr-10 text-white/70" href="/privacy-policy">
               Privacy Policy
             </Link>
           </div>
