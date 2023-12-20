@@ -1,2 +1,2 @@
-web: cd Website && npm start
+web: npm start
 worker: python TwitterBot/bot.py
