@@ -1,14 +1,13 @@
-import clientPromise from "@/lib/mongodb";
+import clientPromise from "../../lib/mongodb";
 import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { TranslationBox } from "@/components/TranslationBox";
-import Error from "@/components/Error";
-import Divider from "@/components/Divider";
+import { TranslationBox } from "../../components/TranslationBox";
+import Error from "../../components/Error";
+import Divider from "../../components/Divider";
 import axios from "axios";
 import Image from "next/image";
-import FormatText from "@/components/FormatText";
-
+import FormatText from "../../components/FormatText";
 export default function TweetPage({ tweet, error, userData, relatedTweets }) {
   const router = useRouter();
   const botProperties = getBotProperties(router.query.botname);
