@@ -1,4 +1,4 @@
-import clientPromise from "database/mongodb.js";
+import clientPromise from "@/database/mongodb";
 import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from "next/router";
