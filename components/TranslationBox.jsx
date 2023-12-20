@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import FormatText from "./FormatText";
+import FormatText from "components/FormatText.jsx";
 import Link from "next/link";
-import Navbar from "./SecondaryNavbar";
+import Navbar from "components/SecondaryNavbar.jsx";
 
 export const TranslationBox = ({
   tweet,

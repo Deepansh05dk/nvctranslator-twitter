@@ -1,7 +1,7 @@
-import AiBotCard from "../components/AiBotCard";
+import AiBotCard from "components/AiBotCard";
 import Image from "next/image";
 import Link from "next/link";
-import Divider from "../components/Divider";
+import Divider from "components/Divider";
 
 export default function Home() {
   return (
