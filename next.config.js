@@ -6,9 +6,6 @@ const nextConfig = {
       {
         hostname: "pbs.twimg.com",
       },
-      {
-        hostname: "images.unsplash.com",
-      },
     ],
   },
 };
