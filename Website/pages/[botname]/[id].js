@@ -8,6 +8,7 @@ import Divider from "@/components/Divider";
 import axios from "axios";
 import Image from "next/image";
 import FormatText from "@/components/FormatText";
+
 export default function TweetPage({ tweet, error, userData, relatedTweets }) {
   const router = useRouter();
   const botProperties = getBotProperties(router.query.botname);
@@ -53,7 +54,12 @@ export default function TweetPage({ tweet, error, userData, relatedTweets }) {
                   </svg>
                 </Link>
               </div>
-              <Divider text={`More from ${userData.name}`} />
+              <Divider
+                text={`More from ${
+                  userData.name.slice(0, 21) +
+                  (userData.name.length > 21 ? "..." : "")
+                }`}
+              />
               <section className="flex justify-center flex-wrap my-10">
                 {relatedTweets.map((related_tweet) => {
                   return (
@@ -64,7 +70,7 @@ export default function TweetPage({ tweet, error, userData, relatedTweets }) {
                         )
                       }
                       className=" cursor-pointer rounded-md h-96 border shadow-md w-80 m-5 transition-transform transform hover:scale-105 px-6 bg-white"
-                      key={related_tweet.id}
+                      key={related_tweet.tweet_id}
                     >
                       <div className="flex flex-row w-full items-center space-x-4 py-5 ">
                         <div>
@@ -80,8 +86,9 @@ export default function TweetPage({ tweet, error, userData, relatedTweets }) {
                           className="flex flex-col items-start"
                           href={`https://twitter.com/${userData.username}`}
                         >
-                          <div className="font-semibold text-base">
-                            {userData.name}
+                          <div className="font-semibold text-sm sm:text-base">
+                            {userData.name.slice(0, 20) +
+                              (userData.name.length > 20 ? "..." : "")}
                           </div>
                           <div className="font-extralight text-xs">
                             @{userData.username}

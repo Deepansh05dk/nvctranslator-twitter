@@ -48,7 +48,10 @@ export const TranslationBox = ({
             className="flex flex-col items-start"
             href={`https://twitter.com/${userData.username}`}
           >
-            <div className="font-semibold text-lg">{userData.name}</div>
+            <div className="font-semibold  text-base sm:text-lg">
+              {userData.name.slice(0, 30) +
+                (userData.name.length > 30 ? "..." : "")}
+            </div>
             <div className="font-extralight text-sm">@{userData.username}</div>
           </Link>
         </div>
@@ -73,7 +76,7 @@ export const TranslationBox = ({
                   : "text-gray-500 hover:text-gray-700")
               }
             >
-              Translated
+              {botname === "makethismature" ? "Mature" : "Translated"}
             </button>
             <button
               type="button"
@@ -85,7 +88,7 @@ export const TranslationBox = ({
                   : `${theme} shadow-sm text-white`)
               }
             >
-              Original
+              {botname === "makethismature" ? "Immature" : "Original"}
             </button>
           </div>
         </div>
