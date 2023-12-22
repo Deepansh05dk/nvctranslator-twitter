@@ -1,29 +1,29 @@
-import AiBotCard from "@/components/AiBotCard";
+import AiBotCard from "../components/AiBotCard";
 import Image from "next/image";
 import Link from "next/link";
-import Divider from "@/components/Divider";
+import Divider from "../components/Divider";
 
 export default function Home() {
   return (
     <div className="min-h-screen">
       <main>
         <section className="relative bg-custom bg-cover bg-center bg-no-repeat">
-          <div className="absolute inset-0 bg-transparent from-[#83a7af] bg-gradient-to-r "></div>
+          <div className="absolute inset-0 bg-transparent from-[#c3c6c7] bg-gradient-to-r "></div>
           <div className="relative mx-auto max-w-screen-xl px-4 py-32 sm:px-6 lg:flex lg:h-screen lg:items-center lg:px-8">
-            <div className="max-w-xl text-center sm:text-left ">
-              <h1 className="text-3xl font-extrabold sm:text-5xl">
+            <div className="max-w-3xl  sm:text-left px-10">
+              <h1 className="text-3xl font-extrabold sm:text-5xl ">
                 Crafting Your Ideal Twitter Experience
               </h1>
 
-              <p className="mt-4 max-w-lg sm:text-2xl/relaxed">
+              <p className="mt-4 font-semibold max-w-xl sm:text-2xl/relaxed">
                 Where AI Meets Tweeting – Crafting Smarter Conversations for the
                 Digital Age.
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-4 text-center">
+              <div className="mt-8 flex flex-wrap gap-4 text-center ">
                 <Link
                   href="#bots"
-                  className="flex w-full justify-center rounded bg-[#316382] px-12 py-3 text-sm font-medium text-white shadow hover:bg-[#316382]/80 focus:outline-none sm:w-auto"
+                  className="flex  justify-center rounded bg-[var(--primary-colour)] px-12 py-3 sm:text-sm text-xs font-medium text-white shadow hover:scale-[1.02] focus:outline-none sm:w-auto"
                 >
                   Explore Our Bots
                   <svg
@@ -41,7 +41,7 @@ export default function Home() {
 
                 <Link
                   href="#demo"
-                  className="flex w-full justify-center rounded bg-white px-12 py-3 text-sm font-medium text-[#316382] shadow hover:text-[#316382]/80 focus:outline-none  sm:w-auto"
+                  className="flex  justify-center rounded bg-white px-12 py-3 sm:text-sm text-xs font-medium text-[var(--primary-colour)] shadow hover:scale-[1.02] focus:outline-none sm:w-auto"
                 >
                   Demo
                   <svg
@@ -73,13 +73,13 @@ export default function Home() {
               />
             </div>
             <div className="p-4 md:p-8">
-              <div className="max-w-2xl mx-auto my-8 p-4 text-[#316382]">
+              <div className="max-w-2xl mx-auto my-8 p-4 text-[var(--primary-colour)]">
                 <h2 className="text-2xl lg:text-3xl font-bold mb-4">
                   How to Use Our Twitter AI Bots
                 </h2>
                 <ol className="list-decimal list-inside">
                   <li className="mb-4 flex">
-                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 text-xl font-bold rounded-full bg-[#316382] text-white mr-3">
+                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 text-xl font-bold rounded-full bg-[var(--primary-colour)] text-white mr-3">
                       1
                     </div>
                     <div className="lg:text-lg">
@@ -98,7 +98,7 @@ export default function Home() {
                     </div>
                   </li>
                   <li className="mb-4 flex">
-                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 text-xl font-bold rounded-full bg-[#316382] text-white mr-3">
+                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 text-xl font-bold rounded-full bg-[var(--primary-colour)] text-white mr-3">
                       2
                     </div>
                     <div className="lg:text-lg">
@@ -117,7 +117,7 @@ export default function Home() {
                     </div>
                   </li>
                   <li className="flex">
-                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 text-xl font-bold rounded-full bg-[#316382] text-white mr-3">
+                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 text-xl font-bold rounded-full bg-[var(--primary-colour)] text-white mr-3">
                       3
                     </div>
                     <span className="lg:text-lg">

@@ -1,13 +1,13 @@
-import clientPromise from "@/database/mongodb";
+import clientPromise from "../../lib/mongodb";
 import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { TranslationBox } from "@/components/TranslationBox.jsx";
-import Error from "@/components/Error";
-import Divider from "@/components/Divider";
+import { TranslationBox } from "../../components/TranslationBox";
+import Error from "../../components/Error";
+import Divider from "../../components/Divider";
 import axios from "axios";
 import Image from "next/image";
-import FormatText from "@/components/FormatText";
+import FormatText from "../../components/FormatText";
 
 export default function TweetPage({ tweet, error, userData, relatedTweets }) {
   const router = useRouter();
@@ -38,7 +38,7 @@ export default function TweetPage({ tweet, error, userData, relatedTweets }) {
               <div className="flex justify-end my-10">
                 <Link
                   href="/"
-                  className="flex w-full justify-center rounded bg-[#316382] px-12 py-3 text-sm font-medium text-white shadow hover:bg-[#316382]/80 focus:outline-none focus:ring sm:w-auto"
+                  className="flex w-full justify-center rounded bg-[var(--primary-colour)] px-12 py-3 text-sm font-medium text-white shadow hover:scale-[1.02] focus:outline-none focus:ring sm:w-auto"
                 >
                   Explore Our More AI Bots
                   <svg

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import FormatText from "@/components/FormatText.jsx";
+import FormatText from "./FormatText";
 import Link from "next/link";
-import Navbar from "@/components/SecondaryNavbar.jsx";
+import Navbar from "./SecondaryNavbar";
 
 export const TranslationBox = ({
   tweet,
@@ -98,7 +98,7 @@ export const TranslationBox = ({
             type="button"
             id="copyButton"
             onClick={handleCopyClick}
-            className={`px-4 py-2 my-5 font-medium rounded-md ${theme} text-white hover:scale-105 hover:shadow-xl`}
+            className={`px-4 py-2 my-5 font-medium rounded-md ${theme} text-white hover:scale-[1.02]`}
           >
             Copy
           </button>

@@ -4,23 +4,28 @@ import Image from "next/image";
 
 const Navbar = () => {
   return (
-    <header className="text-white body-font sticky top-0 z-20 bg-[#316382] ">
+    <header className="text-white body-font sticky top-0 z-20 bg-[var(--primary-colour)] ">
       <div className="container mx-auto flex sm:flex-row px-6 py-[10px] sm:py-3 flex-row items-center justify-between ">
         <Link
           className="flex title-font font-medium items-center  md:mb-0"
           href={"/"}
         >
-          <Image
-            src={"/logos/main.jpeg"}
-            className=" rounded-full bg-white"
-            alt="logo"
-            width={50}
-            height={50}
-          />
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white">
+            <Image
+              src={"/logos/main.png"}
+              className=" text-white rounded-full bg-white inline"
+              alt="logo"
+              width={35}
+              height={35}
+            />
+          </div>
           <span className="ml-3 text-base sm:text-xl">XAICompanions</span>
         </Link>
-        {/* <button className="inline-flex items-center bg-[#316382] border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-sm sm:text-base md:mt-0">
-          Try our Bots
+        <Link
+          href="/about"
+          className="inline-flex items-center text-[var(--primary-colour)] bg-white border-0 py-1 px-3 focus:outline-none rounded text-sm sm:text-base font-medium hover:scale-[1.02]"
+        >
+          About Us
           <svg
             fill="none"
             stroke="currentColor"
@@ -32,7 +37,7 @@ const Navbar = () => {
           >
             <path d="M5 12h14M12 5l7 7-7 7"></path>
           </svg>
-        </button> */}
+        </Link>
       </div>
     </header>
   );

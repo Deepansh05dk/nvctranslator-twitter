@@ -3,5 +3,12 @@
 @import "tailwindcss/utilities";
 
 .bg-custom {
-  background-image: url("/cover_page.png");
+  background-image: url("/cover.png");
+}
+
+:root {
+  --primary-colour: #2d3437;
+}
+.bg-above-custom {
+  background-image: url("/l5.png");
 }

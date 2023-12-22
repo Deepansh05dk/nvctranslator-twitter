@@ -2,15 +2,15 @@ import React from "react";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="container mx-auto px-10 py-10 text-[#316382]">
-      <h1 className="text-3xl font-bold underline text-center my-6 text-[#233d4d]">
+    <div className="container mx-auto px-10 py-10 text-gray-500">
+      <h1 className="text-3xl font-bold underline text-center my-6 text-[var(--primary-colour)]">
         Privacy Policy
       </h1>
       <section className="mb-6">
-        <h2 className="text-2xl font-semibold mb-4 text-[#233d4d]">
+        <h2 className="text-2xl font-bold mb-4 text-[var(--primary-colour)]">
           Data Collection
         </h2>
-        <p className="text-lg">
+        <p className="text-base">
           We collect various types of information for various purposes to
           provide and improve our service to you.
         </p>
@@ -32,10 +32,10 @@ const PrivacyPolicy = () => {
         </ul>
       </section>
       <section className="mb-6">
-        <h2 className="text-2xl font-semibold mb-4 text-[#233d4d]">
+        <h2 className="text-2xl font-bold mb-4 text-[var(--primary-colour)]">
           Use of Data
         </h2>
-        <p className="text-lg">
+        <p className="text-base">
           XAICompanions uses the collected data for various purposes:
         </p>
         <ul className="list-disc pl-5">
@@ -55,10 +55,10 @@ const PrivacyPolicy = () => {
         </ul>
       </section>
       <section className="mb-6">
-        <h2 className="text-2xl font-semibold mb-4 text-[#233d4d]">
+        <h2 className="text-2xl font-bold mb-4 text-[var(--primary-colour)]">
           Data Protection
         </h2>
-        <p className="text-lg">
+        <p className="text-base">
           The security of your data is important to us but remember that no
           method of transmission over the Internet or method of electronic
           storage is 100% secure. While we strive to use commercially acceptable
@@ -67,10 +67,10 @@ const PrivacyPolicy = () => {
         </p>
       </section>
       <section className="mb-6">
-        <h2 className="text-2xl font-semibold mb-4 text-[#233d4d]">
+        <h2 className="text-2xl font-bold mb-4 text-[var(--primary-colour)]">
           Contact Us
         </h2>
-        <p className="text-lg">
+        <p className="text-base">
           If you have any questions about this Privacy Policy, please contact
           us.
         </p>
