@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const PrivacyPolicy = () => {
   return (
@@ -70,9 +71,25 @@ const PrivacyPolicy = () => {
         <h2 className="text-2xl font-bold mb-4 text-[var(--primary-colour)]">
           Contact Us
         </h2>
-        <p className="text-base">
-          If you have any questions about this Privacy Policy, please contact
-          us.
+        <p className="text-base flex items-center">
+          If you have any questions about this Privacy Policy, please contact us
+          through our email.
+          <Link
+            rel="noopener noreferrer"
+            href="mailto:xaicompanions@gmail.com"
+            title="Email"
+            className="inline-flex ml-4 items-center justify-center w-10 h-10 rounded-full bg-white text-gray-900 hover:scale-[1.02]"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-5 h-5"
+            >
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+            </svg>
+          </Link>
         </p>
       </section>
     </div>
