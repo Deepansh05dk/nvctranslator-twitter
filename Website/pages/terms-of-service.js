@@ -3,7 +3,7 @@ import React from "react";
 const TermsOfService = () => {
   return (
     <div className="container mx-auto px-10 py-10 text-gray-500">
-      <h1 className="text-3xl font-bold text-center my-6 text-[var(--primary-colour)] underline">
+      <h1 className="text-3xl font-bold text-center mb-6 text-[var(--primary-colour)] underline">
         Terms of Service
       </h1>
 
