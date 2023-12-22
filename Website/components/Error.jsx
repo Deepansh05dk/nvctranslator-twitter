@@ -3,12 +3,12 @@ import Link from "next/link";
 
 const Error = ({ error, bot }) => {
   return (
-    <section className="flex items-center h-full sm:py-16 text-[#316382] min-h-[90vh]">
+    <section className="flex items-center h-full sm:py-16 text-[var(--primary-colour)] min-h-[90vh]">
       <div className="container flex flex-col items-center justify-center mx-auto my-8 space-y-8 text-center sm:max-w-4xl">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
-          className="w-40 h-40 dark:text-gray-600"
+          className="w-40 h-40 text-[var(--primary-colour]"
         >
           <path
             fill="currentColor"
@@ -40,7 +40,7 @@ const Error = ({ error, bot }) => {
         <Link
           rel="noopener noreferrer"
           href="/"
-          className="px-8 py-3 font-semibold rounded bg-[#316382] hover:bg-[#316382]/80 text-white"
+          className="px-8 py-3 font-semibold rounded bg-[var(--primary-colour)] hover:scale-[1.02] text-white"
         >
           Back to homepage
         </Link>

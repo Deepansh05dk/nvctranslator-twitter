@@ -10,7 +10,7 @@ export default function App({ Component, pageProps }) {
         <title>XAICompanions</title>
         <link
           rel="shortcut icon"
-          href={"/logos/main.jpeg"}
+          href={"/logos/main.png"}
           type="image/x-icon"
         />
       </Head>
