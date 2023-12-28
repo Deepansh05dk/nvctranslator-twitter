@@ -9,6 +9,7 @@ from text_processing import get_text_from_GPT
 from db_operations import insert_tweet, get_tweet_by_id
 from text_processing import create_sentences, remove_urls
 import re
+from imagegenertor import create_image_with_text
 
 load_dotenv()
 
