@@ -179,7 +179,7 @@ async def handle_each_mention(bot: str, params: dict):
     await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=translated_text, bot=bot, username=params['userdetails_who_posted']['username'])
 
     # code to store translation,original and user details in database
-    await insert_tweet(db=params['db'], tweet_id=params['tweet_id'], sentences=translated_text, userdetails_who_posted=params['userdetails_who_posted'], bot=bot, original_text=params['in_reply_to_user_text'])
+    await insert_tweet(db=params['db'], tweet_id=params['in_reply_to_tweet_id'], sentences=translated_text, userdetails_who_posted=params['userdetails_who_posted'], bot=bot, original_text=params['in_reply_to_user_text'])
 
 
 async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, index: int, db):
