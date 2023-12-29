@@ -4,24 +4,24 @@ import textwrap
 
 
 Bot_resultimage_details = {
-    "nvctranslator": {
+    "@nvctranslator": {
         "text_position": (900, 510),
         "username_font_colour": "#f59e0b",
         "max_chars_per_line": 32
     },
-    "adulttranslate": {
+    "@adulttranslate": {
         "text_position": (420, 250),
         "username_font_colour": "#000080",
         "max_chars_per_line": 38
 
     },
-    "eli5translator": {
+    "@eli5translator": {
         "text_position": (320, 200),
         "username_font_colour": "#008080",
         "max_chars_per_line": 46
 
     },
-    "makethismature": {
+    "@makethismature": {
         "text_position": (380, 480),
         "username_font_colour": "#573c27",
         "max_chars_per_line": 40
@@ -70,7 +70,7 @@ def draw_text(draw, text: str, position: list, font, image_width: int, line_spac
 
 def create_image_with_text(text: str, bot: str, username: str):
     """ Create text on image """
-    image_path = "TwitterBot/image_templates/"+bot+".png"
+    image_path = "TwitterBot/image_templates/"+bot[1:]+".png"
     with Image.open(image_path) as base:
         # Create a drawing context
         draw = ImageDraw.Draw(base)

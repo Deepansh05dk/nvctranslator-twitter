@@ -7,10 +7,6 @@ load_dotenv()
 # database configuration details
 
 mongo_url = os.getenv('MONGOURL')
-DATABASE_NAMES = {"@nvctranslator": "nvctranslator",
-                  "@eli5translator": "eli5translator",
-                  "@adulttranslate": "adulttranslate",
-                  "@makethismature": "makethismature"}
 COLLECTION_NAME = "tweets"
 
 
@@ -27,12 +23,12 @@ async def connect_to_mongodb() -> motor.motor_asyncio.AsyncIOMotorDatabase:
         return None
 
 
-async def get_tweet_by_id(db, tweet_id: str, mention: str):
+async def get_tweet_by_id(db, tweet_id: str, bot: str):
     """
     Retrieves a tweet by its ID from the database.
     """
     try:
-        tweet = await db[DATABASE_NAMES[mention]][COLLECTION_NAME].find_one({"tweet_id": tweet_id})
+        tweet = await db[bot[1:]][COLLECTION_NAME].find_one({"tweet_id": tweet_id})
         logging.info(f'Successfully retrieved tweet with id: {tweet_id}')
         return tweet
     except Exception as e:
@@ -40,14 +36,14 @@ async def get_tweet_by_id(db, tweet_id: str, mention: str):
         return None
 
 
-async def insert_tweet(db, tweet_id: str, sentences: list, mention: str, userdetails_who_posted: dict, original_text: str):
+async def insert_tweet(db, tweet_id: str, sentences: list, bot: str, userdetails_who_posted: dict, original_text: str):
     """
     Inserts a tweet into the database.
     """
     try:
         tweet_data = {"translated_text": "<<>>".join(
             sentences), "original_text": original_text, "tweet_id": tweet_id, "userdetails_who_posted": userdetails_who_posted}
-        await db[DATABASE_NAMES[mention]][COLLECTION_NAME].insert_one(tweet_data)
+        await db[bot[1:]][COLLECTION_NAME].insert_one(tweet_data)
         logging.info(f'Successfully inserted tweet with id: {tweet_id}')
     except Exception as e:
         logging.error(f'Error inserting tweet: {e}')

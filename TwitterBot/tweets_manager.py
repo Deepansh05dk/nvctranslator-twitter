@@ -10,6 +10,7 @@ from db_operations import insert_tweet, get_tweet_by_id
 from text_processing import create_sentences, remove_urls
 import re
 from imagegenertor import create_image_with_text
+import tweepy
 
 load_dotenv()
 
@@ -22,21 +23,28 @@ Tweepy_clients = {
     "@makethismature": AsyncClient(consumer_key=os.environ['MATURE_CONSUMER_KEY'], consumer_secret=os.environ['MATURE_CONSUMER_SECRET'], access_token=os.environ['MATURE_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['MATURE_ACCESS_TOKEN_SECRET'])
 }
 
+Tweepy_auth = {
+    "@nvctranslator": tweepy.OAuth1UserHandler(consumer_key=os.environ['NVC_CONSUMER_KEY'], consumer_secret=os.environ['NVC_CONSUMER_SECRET'], access_token=os.environ['NVC_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['NVC_ACCESS_TOKEN_SECRET']),
+    "@eli5translator": tweepy.OAuth1UserHandler(consumer_key=os.environ['ELI5_CONSUMER_KEY'], consumer_secret=os.environ['ELI5_CONSUMER_SECRET'], access_token=os.environ['ELI5_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ELI5_ACCESS_TOKEN_SECRET']),
+    "@adulttranslate": tweepy.OAuth1UserHandler(consumer_key=os.environ['ADULT_CONSUMER_KEY'], consumer_secret=os.environ['ADULT_CONSUMER_SECRET'], access_token=os.environ['ADULT_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ADULT_ACCESS_TOKEN_SECRET']),
+    "@makethismature": tweepy.OAuth1UserHandler(consumer_key=os.environ['MATURE_CONSUMER_KEY'], consumer_secret=os.environ['MATURE_CONSUMER_SECRET'], access_token=os.environ['MATURE_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['MATURE_ACCESS_TOKEN_SECRET'])
+}
+
 Bots_list = ["@nvctranslator", "@eli5translator",
              "@adulttranslate", "@makethismature"]
 
 
-def get_intro_for_the_tweet(username: str, mention: str):
+def get_intro_for_the_tweet(username: str, bot: str):
     """Get a introduction for the tweet"""
-    match mention:
+    match bot:
         case "@nvctranslator":
-            intro = f"Here's a translation of @{username}’s message using Nonviolent Communication principles:"
+            intro = f"Here's a translation of @{username}’s message using Nonviolent Communication principles."
         case "@eli5translator":
-            intro = f"Here is @{username}’s message explained like a 5-year-old would understand:"
+            intro = f"Here is @{username}’s message explained like a 5-year-old would understand."
         case "@adulttranslate":
-            intro = f"To align with adult communication norms, here is @{username}’s message conveyed in a more formal manner:"
+            intro = f"To align with adult communication norms, here is @{username}’s message conveyed in a more formal manner."
         case "@makethismature":
-            intro = f"To elevate and refine the tone, here is @{username}’s message presented in mature language:"
+            intro = f"To elevate and refine the tone, here is @{username}’s message presented in mature language."
     return intro
 
 
@@ -64,7 +72,7 @@ def extract_mentions(text: list[str]):
     return mentions
 
 
-def divide_into_tweets(sentences: list, username_who_posted: str, mention: str, tweet_id: str, max_length: int = 275, max_tweets: int = 2) -> list:
+# def divide_into_tweets(sentences: list, username_who_posted: str, mention: str, tweet_id: str, max_length: int = 275, max_tweets: int = 2) -> list:
     """
     Divides a list of text into tweets, each not exceeding the max_length.
     """
@@ -107,81 +115,71 @@ def divide_into_tweets(sentences: list, username_who_posted: str, mention: str, 
     return tweets
 
 
-async def translator(full_text: str, username_who_posted: str, mention: str, tweet_id: str) -> tuple:
+async def translator(full_text: str, bot: str) -> list[str]:
     """
     Translates the provided text using GPT and divides it into tweets.
     """
     sentences = create_sentences(text=full_text)
     tasks = [
         asyncio.create_task(get_text_from_GPT(
-            text=sentence, prompt_type=mention))
-        for sentence in sentences[:20]
+            text=sentence, prompt_type=bot))
+        for sentence in sentences
     ]
     results = await asyncio.gather(*tasks)
-    tweets = divide_into_tweets(
-        sentences=results, username_who_posted=username_who_posted, mention=mention, tweet_id=tweet_id)
-    return (tweets, sentences[20:], results)
+    # tweets = divide_into_tweets(
+    #     sentences=results, username_who_posted=username_who_posted, mention=mention, tweet_id=tweet_id)
+    return results
 
 
-async def reply_to_tweet(tweet_id: str, reply_text: list[str], client_type: str):
+async def reply_to_tweet(tweet_id: str, reply_text: list[str], bot: str, username: str):
     """
     Replies to a tweet with the given text.
     """
     try:
-        client = Tweepy_clients[client_type]
-        tweet_id_to_reply = tweet_id
-        for i in range(0, len(reply_text)):
-            tweet_reply_text = reply_text[i]
-            status = await client.create_tweet(
-                text=str(tweet_reply_text), in_reply_to_tweet_id=tweet_id_to_reply)
-            tweet_id_to_reply = status[0]['id']
-
+        client = Tweepy_clients[bot]
+        auth = Tweepy_auth[bot]
+        api = tweepy.API(auth)
+        img_byte_arr = create_image_with_text(
+            text=" ".join(reply_text), bot=bot, username=username)
+        media = api.media_upload(filename=tweet_id+".png", file=img_byte_arr)
+        base_url = os.environ['HOST_URL'] + bot[1:]+'/'
+        url_link = base_url+tweet_id
+        await client.create_tweet(
+            text=get_intro_for_the_tweet(username=username, bot=bot)+f"\n\nTo read the full text, please visit: {url_link}", in_reply_to_tweet_id=tweet_id, media_ids=[media.media_id])
         logging.info("Successfully replied to tweet")
 
     except Exception as e:
-
         logging.error(f"Error replying to tweet {tweet_id}: {e}")
 
 
-async def handle_remaining_tweet_text(to_convert: list, converted: list, db, tweet_id: str, mention: str, userdetails_who_posted: dict, original_text: str):
-    """
-    Handles the remaining text for conversion and inserts into the database.
-    """
-    all_converted_text = converted + await asyncio.gather(
-        *[asyncio.create_task(get_text_from_GPT(text, prompt_type=mention)) for text in to_convert]
-    )
-    await insert_tweet(db, tweet_id, all_converted_text, userdetails_who_posted=userdetails_who_posted, mention=mention, original_text=original_text)
-
-
-async def handle_each_mention(mention: str, params: dict):
+async def handle_each_mention(bot: str, params: dict):
     """
     Handles the each mention or bot in tweet
     """
     # check if tweet exist in database
     tweet_from_database = await get_tweet_by_id(
-        tweet_id=params['in_reply_to_tweet_id'], db=params['db'], mention=mention)
+        tweet_id=params['in_reply_to_tweet_id'], db=params['db'], bot=bot)
     if (tweet_from_database):
         logging.info("Tweet already translated")
         translated_text = tweet_from_database['translated_text'].split(
             "<<>>")
-        tweets_to_reply = divide_into_tweets(
-            sentences=translated_text, username_who_posted=params['userdetails_who_posted']['username'], mention=mention, tweet_id=params['in_reply_to_tweet_id'])
-        await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=tweets_to_reply, client_type=mention)
+        # tweets_to_reply = divide_into_tweets(
+        #     sentences=translated_text, username_who_posted=params['userdetails_who_posted']['username'], mention=mention, tweet_id=params['in_reply_to_tweet_id'])
+        await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=translated_text, bot=bot, username=params['userdetails_who_posted']['username'])
         return
 
     # Your code to get translated text
-    tweets_to_reply, to_convert, converted = await translator(
-        full_text=str(params['in_reply_to_user_text']), username_who_posted=params['userdetails_who_posted']['username'], mention=mention, tweet_id=params['in_reply_to_tweet_id'])
+    translated_text = await translator(
+        full_text=str(params['in_reply_to_user_text']), bot=bot)
 
     # code to reply to the tweet
-    if (len(tweets_to_reply) == 0 or len(tweets_to_reply[0]) == 0 or tweets_to_reply == None):
+    if (len(translated_text) == 0 or len(translated_text[0]) == 0 or translated_text == None):
         logging.warning("No text recieved from translator")
         return
-    await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=tweets_to_reply, client_type=mention)
+    await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=translated_text, bot=bot, username=params['userdetails_who_posted']['username'])
 
-    # code to store convert remaing text and store in database
-    await handle_remaining_tweet_text(
-        to_convert=to_convert, converted=converted, db=params['db'], tweet_id=params['in_reply_to_tweet_id'], mention=mention, userdetails_who_posted=params['userdetails_who_posted'], original_text=params['in_reply_to_user_text'])
+    # code to store translation,original and user details in database
+    await insert_tweet(db=params['db'], tweet_id=params['tweet_id'], sentences=translated_text, userdetails_who_posted=params['userdetails_who_posted'], bot=bot, original_text=params['in_reply_to_user_text'])
 
 
 async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, index: int, db):
@@ -236,8 +234,8 @@ async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, inde
                 tasks = []
                 for mention in extract_mentions(text=tweet_text):
                     if (mention in Bots_list):
-                        tasks.append(handle_each_mention(mention=mention, params={'in_reply_to_tweet_id': in_reply_to_tweet_id, 'db': db,
-                                                                                  'in_reply_to_user_text': in_reply_to_user_text, 'tweet_id': tweet_id, 'userdetails_who_posted': userdetails_who_posted}))
+                        tasks.append(handle_each_mention(bot=mention, params={'in_reply_to_tweet_id': in_reply_to_tweet_id, 'db': db,
+                                                                              'in_reply_to_user_text': in_reply_to_user_text, 'tweet_id': tweet_id, 'userdetails_who_posted': userdetails_who_posted}))
                 await asyncio.gather(*tasks)
             else:
                 logging.warning('This tweet is not a reply')

@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <main>
-        <section className="relative bg-custom bg-cover bg-center bg-no-repeat">
+        <section className="relative bg-custom bg-cover bg-blend-hard-light bg-center bg-no-repeat min-h-[80vh] fadeIn max-h-[90vh] ">
           <div className="absolute inset-0 bg-transparent from-[#c3c6c7] bg-gradient-to-r "></div>
           <div className="relative mx-auto max-w-screen-xl px-4 py-32 sm:px-6 lg:flex lg:h-screen lg:items-center lg:px-8">
             <div className="max-w-3xl  sm:text-left px-10">
@@ -61,7 +61,7 @@ export default function Home() {
           </div>
         </section>
         <Divider text={"Demo"} />
-        <section id="demo" className="flex justify-center">
+        <section id="demo" className="flex justify-center ">
           <div className="overflow-hidden  lg:grid lg:grid-cols-2 my-10 max-w-screen-xl">
             <div className="flex justify-center items-center p-8">
               <Image
@@ -135,7 +135,7 @@ export default function Home() {
         <Divider text={"Bots"} />
         <section
           id="bots"
-          className="flex justify-center items-center flex-wrap my-20 sm:px-5 lg:px-10"
+          className="flex justify-center items-center flex-wrap my-20 sm:px-5 lg:px-10 "
         >
           {bots.map((bot) => (
             <AiBotCard key={bot.name} bot={bot} />
