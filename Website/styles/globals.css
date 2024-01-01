@@ -5,6 +5,9 @@
 .bg-custom {
   background-image: url("/cover.png");
 }
+.bg-about {
+  background-image: url("/about.png");
+}
 @keyframes fadeIn {
   from {
     opacity: 0;

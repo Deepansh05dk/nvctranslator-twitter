@@ -1,18 +1,11 @@
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 const About = () => {
   return (
-    <div className="p-5 sm:p-10 md:p-16 ">
-      <div className="flex flex-col mx-auto container overflow-hidden rounded ">
-        <Image
-          src="/about.png"
-          alt="about"
-          className="w-full h-[40vh] sm:h-[60vh]"
-          width={1792}
-          height={1024}
-        />
+    <div className="px-5 sm:px-5 md:px-10 py-5 sm:py-10">
+      <div className="flex flex-col  sm:px-6 md:px-10 lg:px-20 overflow-hidden rounded ">
+        <div className="w-full h-[40vh] sm:h-[50vh] bg-cover bg-center bg-about"></div>
         <div className="p-6 pb-12 m-4 mx-auto -mt-16 space-y-6  sm:px-10 sm:mx-12 lg:rounded-md bg-white shadow-md font-sans">
           <div className="  text-gray-500">
             <div>
