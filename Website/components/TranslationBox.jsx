@@ -76,7 +76,7 @@ export const TranslationBox = ({
                   : "text-gray-500 hover:text-gray-700")
               }
             >
-              {botname === "makethismature" ? "Mature" : "Translated"}
+              {botname === "makethismature" ? "MoreMature" : "Translated"}
             </button>
             <button
               type="button"
@@ -88,7 +88,7 @@ export const TranslationBox = ({
                   : `${theme} shadow-sm text-white`)
               }
             >
-              {botname === "makethismature" ? "Immature" : "Original"}
+              Original
             </button>
           </div>
         </div>
