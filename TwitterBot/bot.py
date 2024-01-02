@@ -5,8 +5,6 @@ from tweepy.asynchronous import AsyncClient
 import os
 import logging
 import asyncio
-from nltk import download as nltk_download
-nltk_download('punkt')
 
 load_dotenv()
 
@@ -74,6 +72,7 @@ async def main():
     while 1:
         WAIT_TIME = 16  # secs
         await asyncio.gather(twitter_bots(db=db), asyncio.sleep(WAIT_TIME))
+
 
 if __name__ == "__main__":
     asyncio.run(main())

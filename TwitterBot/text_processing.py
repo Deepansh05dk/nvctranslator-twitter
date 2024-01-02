@@ -1,5 +1,4 @@
 import re
-import nltk
 from openai import AsyncOpenAI
 import os
 import logging
@@ -13,7 +12,7 @@ OPENAI_CLIENT = AsyncOpenAI(api_key=os.getenv('OPENAI'))
 
 prompts = {
     "@nvctranslator": "Translate into simple Nonviolent Communication (NVC) language ",
-    "@eli5translator": "Condense this text into a child-friendly explanation. Use simple language and fun analogies, avoiding complex terms, to make it understandable and engaging for a 5-year-old",
+    "@eli5translator": "Explain like I am five year old",
     "@adulttranslate": "Tailor the text to sound more 'adult-like', perhaps by refining slang or casual language into simple formal English",
     "@makethismature": "Converts immature or simplistic language in text into a more sophisticated and mature form, perhaps for professional or academic use"
 }
@@ -46,15 +45,15 @@ def remove_mentions_hashtags(text: str):
     return text.strip()
 
 
-def create_sentences(text: str) -> list:
-    """
-    Splits the given text into sentences.
-    """
-    sentences = []
-    for batch in text.split('\n'):
-        sentences.extend(nltk.sent_tokenize(batch))
-        sentences.append('\n')
-    return sentences[:-1]
+# def create_sentences(text: str) -> list:
+#     """
+#     Splits the given text into sentences.
+#     """
+#     sentences = []
+#     for batch in text.split('\n'):
+#         sentences.extend(nltk.sent_tokenize(batch))
+#         sentences.append('\n')
+#     return sentences[:-1]
 
 
 async def get_text_from_GPT(text: str, prompt_type: str) -> str:
@@ -65,7 +64,7 @@ async def get_text_from_GPT(text: str, prompt_type: str) -> str:
         return text
     try:
         prompt = f"""
-        {prompts[prompt_type]}and keep the output short and precise as possible:-\n
+        {prompts[prompt_type]}. Additionally, ensure that the output retains the newline character '\n' from the original text:-\n
         Original Text:
         "{text}"
         """

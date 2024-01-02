@@ -7,7 +7,7 @@ import asyncio
 import nltk
 from text_processing import get_text_from_GPT
 from db_operations import insert_tweet, get_tweet_by_id
-from text_processing import create_sentences, remove_urls
+from text_processing import remove_urls
 import re
 from imagegenerator import create_image_with_text
 import tweepy
@@ -115,7 +115,7 @@ def extract_mentions(text: list[str]):
     return tweets
 
 
-async def translator(full_text: str, bot: str) -> list[str]:
+# async def translator(full_text: str, bot: str) -> list[str]:
     """
     Translates the provided text using GPT and divides it into tweets.
     """
@@ -131,7 +131,7 @@ async def translator(full_text: str, bot: str) -> list[str]:
     return results
 
 
-async def reply_to_tweet(tweet_id: str, reply_text: list[str], bot: str, username: str):
+async def reply_to_tweet(tweet_id: str, reply_text: str, bot: str, username: str):
     """
     Replies to a tweet with the given text.
     """
@@ -140,7 +140,7 @@ async def reply_to_tweet(tweet_id: str, reply_text: list[str], bot: str, usernam
         auth = Tweepy_auth[bot]
         api = tweepy.API(auth)
         img_byte_arr = create_image_with_text(
-            text=" ".join(reply_text), bot=bot, username=username)
+            text=reply_text, bot=bot, username=username)
         media = api.media_upload(filename=tweet_id+".png", file=img_byte_arr)
         base_url = os.environ['HOST_URL'] + bot[1:]+'/'
         url_link = base_url+tweet_id
@@ -161,25 +161,21 @@ async def handle_each_mention(bot: str, params: dict):
         tweet_id=params['in_reply_to_tweet_id'], db=params['db'], bot=bot)
     if (tweet_from_database):
         logging.info("Tweet already translated")
-        translated_text = tweet_from_database['translated_text'].split(
-            "<<>>")
-        # tweets_to_reply = divide_into_tweets(
-        #     sentences=translated_text, username_who_posted=params['userdetails_who_posted']['username'], mention=mention, tweet_id=params['in_reply_to_tweet_id'])
+        translated_text = " ".join(tweet_from_database['translated_text'].split(
+            "<<>>"))
         await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=translated_text, bot=bot, username=params['userdetails_who_posted']['username'])
         return
 
     # Your code to get translated text
-    translated_text = await translator(
-        full_text=str(params['in_reply_to_user_text']), bot=bot)
-
+    translated_text = await get_text_from_GPT(text=str(params['in_reply_to_user_text']), prompt_type=bot)
     # code to reply to the tweet
-    if (len(translated_text) == 0 or len(translated_text[0]) == 0 or translated_text == None):
+    if (len(translated_text) == 0 or translated_text == None):
         logging.warning("No text recieved from translator")
         return
     await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=translated_text, bot=bot, username=params['userdetails_who_posted']['username'])
 
     # code to store translation,original and user details in database
-    await insert_tweet(db=params['db'], tweet_id=params['tweet_id'], sentences=translated_text, userdetails_who_posted=params['userdetails_who_posted'], bot=bot, original_text=params['in_reply_to_user_text'])
+    await insert_tweet(db=params['db'], tweet_id=params['tweet_id'], translated_text=translated_text, userdetails_who_posted=params['userdetails_who_posted'], bot=bot, original_text=params['in_reply_to_user_text'])
 
 
 async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, index: int, db):
