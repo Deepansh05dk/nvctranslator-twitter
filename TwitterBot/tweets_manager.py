@@ -71,65 +71,6 @@ def extract_mentions(text: list[str]):
     return mentions
 
 
-# def divide_into_tweets(sentences: list, username_who_posted: str, mention: str, tweet_id: str, max_length: int = 275, max_tweets: int = 2) -> list:
-    # """
-    # Divides a list of text into tweets, each not exceeding the max_length.
-    # """
-    # tweets = []
-    # current_tweet = get_intro_for_the_tweet(
-    #     mention=mention, username=username_who_posted)+"\n\n"
-    # for sentence in sentences:
-    #     if len(current_tweet) + len(sentence) + 1 <= max_length:
-    #         current_tweet += " " + \
-    #             sentence if (current_tweet and not current_tweet.endswith(
-    #                 "\n") and sentence != '\n') else sentence
-    #     else:
-    #         words = nltk.word_tokenize(sentence)
-    #         for word in words:
-    #             if len(current_tweet) + len(word) + 1 <= max_length:
-    #                 current_tweet += " " + \
-    #                     word if (current_tweet and not current_tweet.endswith(
-    #                         "\n") and word != '\n') else word
-    #             else:
-    #                 tweets.append(current_tweet)
-    #                 current_tweet = word
-    #                 if len(tweets) == max_tweets:
-    #                     return tweets
-
-    #     if len(tweets) == max_tweets:
-    #         break
-
-    # if current_tweet and len(tweets) < max_tweets:
-    #     tweets.append(current_tweet)
-
-    # if (len(tweets) == 2):
-    #     tweets[0] = ' 1/3 ' + tweets[0]
-    #     tweets[1] = ' 2/3 ' + tweets[1]
-    #     base_url = os.environ['HOST_URL'] + mention[1:]+'/'
-    #     url_link = base_url+tweet_id
-    #     tweets.append(
-    #         f"3/3 Complete text available at {url_link}"
-    #     )
-
-    # return tweets
-
-
-# async def translator(full_text: str, bot: str) -> list[str]:
-    # """
-    # Translates the provided text using GPT and divides it into tweets.
-    # """
-    # sentences = create_sentences(text=full_text)
-    # tasks = [
-    #     asyncio.create_task(get_text_from_GPT(
-    #         text=sentence, prompt_type=bot))
-    #     for sentence in sentences
-    # ]
-    # results = await asyncio.gather(*tasks)
-    # # tweets = divide_into_tweets(
-    # #     sentences=results, username_who_posted=username_who_posted, mention=mention, tweet_id=tweet_id)
-    # return results
-
-
 async def reply_to_tweet(tweet_id: str, reply_text: str, bot: str, username: str):
     """
     Replies to a tweet with the given text.

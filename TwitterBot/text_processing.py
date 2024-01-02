@@ -45,17 +45,6 @@ def remove_mentions_hashtags(text: str):
     return text.strip()
 
 
-# def create_sentences(text: str) -> list:
-#     """
-#     Splits the given text into sentences.
-#     """
-#     sentences = []
-#     for batch in text.split('\n'):
-#         sentences.extend(nltk.sent_tokenize(batch))
-#         sentences.append('\n')
-#     return sentences[:-1]
-
-
 async def get_text_from_GPT(text: str, prompt_type: str) -> str:
     """
     Retrieves text rephrased using GPT from OpenAI.
@@ -63,16 +52,14 @@ async def get_text_from_GPT(text: str, prompt_type: str) -> str:
     if (text == '\n' or text == " " or text == "" or len(text) < 5 or remove_mentions_hashtags(text) == ""):
         return text
     try:
-        prompt = f"""
-        {prompts[prompt_type]}. Additionally, ensure that the output retains the newline character '\n' from the original text:-\n
-        Original Text:
-        "{text}"
-        """
         response = await OPENAI_CLIENT.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{
+                "role": "system",
+                "content": f"You are AI twitter bot .You will be provided with a tweet, and your task is to {prompts[prompt_type]}"
+            }, {
                 "role": "user",
-                "content": prompt
+                "content": text
             }],
             temperature=0.1
         )
