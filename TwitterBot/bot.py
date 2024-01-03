@@ -41,7 +41,7 @@ async def twitter_bots(db):
         # Fetch latest tweets since the last processed tweet
         logger.info("Fetching latest tweets")
 
-        query = '(@nvctranslator OR @eli5translator OR @adulttranslate OR @makethismature) is:reply -is:retweet -is:quote -from:nvctranslator -to:nvctranslator -from:eli5translator -to:eli5translator -from:adulttranslate -to:adulttranslate -from:makethismature -to:makethismature -"use @nvctranslator" -"use @eli5translator" '
+        query = '(@nvctranslator OR @eli5translator OR @woketranslate OR @makethismature) is:reply -is:retweet -is:quote -from:nvctranslator -to:nvctranslator -from:eli5translator -to:eli5translator -from:woketranslate -to:woketranslate -from:makethismature -to:makethismature -"use @nvctranslator" -"use @eli5translator" '
 
         # Your Twitter API request
         latest_tweets = await client.search_recent_tweets(

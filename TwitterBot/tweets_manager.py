@@ -18,19 +18,19 @@ last_processed_time = (datetime.utcnow() -
 Tweepy_clients = {
     "@nvctranslator": AsyncClient(consumer_key=os.environ['NVC_CONSUMER_KEY'], consumer_secret=os.environ['NVC_CONSUMER_SECRET'], access_token=os.environ['NVC_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['NVC_ACCESS_TOKEN_SECRET']),
     "@eli5translator": AsyncClient(consumer_key=os.environ['ELI5_CONSUMER_KEY'], consumer_secret=os.environ['ELI5_CONSUMER_SECRET'], access_token=os.environ['ELI5_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ELI5_ACCESS_TOKEN_SECRET']),
-    "@adulttranslate": AsyncClient(consumer_key=os.environ['ADULT_CONSUMER_KEY'], consumer_secret=os.environ['ADULT_CONSUMER_SECRET'], access_token=os.environ['ADULT_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ADULT_ACCESS_TOKEN_SECRET']),
+    "@woketranslate": AsyncClient(consumer_key=os.environ['WOKE_CONSUMER_KEY'], consumer_secret=os.environ['WOKE_CONSUMER_SECRET'], access_token=os.environ['WOKE_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['WOKE_ACCESS_TOKEN_SECRET']),
     "@makethismature": AsyncClient(consumer_key=os.environ['MATURE_CONSUMER_KEY'], consumer_secret=os.environ['MATURE_CONSUMER_SECRET'], access_token=os.environ['MATURE_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['MATURE_ACCESS_TOKEN_SECRET'])
 }
 
 Tweepy_auth = {
     "@nvctranslator": tweepy.OAuth1UserHandler(consumer_key=os.environ['NVC_CONSUMER_KEY'], consumer_secret=os.environ['NVC_CONSUMER_SECRET'], access_token=os.environ['NVC_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['NVC_ACCESS_TOKEN_SECRET']),
     "@eli5translator": tweepy.OAuth1UserHandler(consumer_key=os.environ['ELI5_CONSUMER_KEY'], consumer_secret=os.environ['ELI5_CONSUMER_SECRET'], access_token=os.environ['ELI5_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ELI5_ACCESS_TOKEN_SECRET']),
-    "@adulttranslate": tweepy.OAuth1UserHandler(consumer_key=os.environ['ADULT_CONSUMER_KEY'], consumer_secret=os.environ['ADULT_CONSUMER_SECRET'], access_token=os.environ['ADULT_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['ADULT_ACCESS_TOKEN_SECRET']),
+    "@woketranslate": tweepy.OAuth1UserHandler(consumer_key=os.environ['WOKE_CONSUMER_KEY'], consumer_secret=os.environ['WOKE_CONSUMER_SECRET'], access_token=os.environ['WOKE_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['WOKE_ACCESS_TOKEN_SECRET']),
     "@makethismature": tweepy.OAuth1UserHandler(consumer_key=os.environ['MATURE_CONSUMER_KEY'], consumer_secret=os.environ['MATURE_CONSUMER_SECRET'], access_token=os.environ['MATURE_ACCESS_TOKEN_KEY'], access_token_secret=os.environ['MATURE_ACCESS_TOKEN_SECRET'])
 }
 
 Bots_list = ["@nvctranslator", "@eli5translator",
-             "@adulttranslate", "@makethismature"]
+             "@woketranslate", "@makethismature"]
 
 
 def get_intro_for_the_tweet(username: str, bot: str):
@@ -40,8 +40,8 @@ def get_intro_for_the_tweet(username: str, bot: str):
             intro = f"Here's a translation of @{username}’s message using Nonviolent Communication principles."
         case "@eli5translator":
             intro = f"Here is @{username}’s message explained like a 5-year-old would understand."
-        case "@adulttranslate":
-            intro = f"To align with adult communication norms, here is @{username}’s message conveyed in a more formal manner."
+        case "@woketranslate":
+            intro = f"With an eye for kindness and understanding, here's @{username}'s message in simpler, thoughtful words."
         case "@makethismature":
             intro = f"To elevate and refine the tone, here is @{username}’s message presented in mature language."
     return intro

@@ -176,10 +176,10 @@ const bots = {
     title: "ELI5Translator",
     logo: "/logos/eli5translator.png",
   },
-  adulttranslate: {
+  woketranslate: {
     themeColor: "bg-[#29558d]",
-    title: "AdultTranslate",
-    logo: "/logos/adulttranslate.png",
+    title: "WokeTranslate",
+    logo: "/logos/woketranslate.png",
   },
   makethismature: {
     themeColor: "bg-[#ab551f]",

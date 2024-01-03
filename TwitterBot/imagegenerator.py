@@ -14,7 +14,7 @@ Bot_resultimage_details = {
         "ymax_allowed": 1700,
         "max_text_lenght_allowed": 350
     },
-    "@adulttranslate": {
+    "@woketranslate": {
         "text_position_x": 380,
         "username_font_colour": "#000080",
         "max_chars_per_line": 45,
