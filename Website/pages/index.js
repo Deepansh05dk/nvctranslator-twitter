@@ -165,7 +165,7 @@ const bots = [
   {
     name: "WokeTranslate",
     description:
-      "Transforming casual tweets into polished, formal English. Your go-to for elevating everyday slang to articulate expressions",
+      "Turning Everyday Language into Culturally Aware Communication. Your Tool for Upgrading Casual Expressions",
     logo: "/logos/woketranslate.png",
     twitterLink: "https://twitter.com/woketranslate",
   },
