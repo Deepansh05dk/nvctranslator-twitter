@@ -163,11 +163,11 @@ const bots = [
     twitterLink: "https://twitter.com/eli5translator",
   },
   {
-    name: "AdultTranslate",
+    name: "WokeTranslate",
     description:
       "Transforming casual tweets into polished, formal English. Your go-to for elevating everyday slang to articulate expressions",
-    logo: "/logos/adulttranslate.png",
-    twitterLink: "https://twitter.com/adulttranslate",
+    logo: "/logos/woketranslate.png",
+    twitterLink: "https://twitter.com/woketranslate",
   },
   {
     name: "MakeThisMature",
