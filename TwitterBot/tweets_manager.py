@@ -79,13 +79,20 @@ async def reply_to_tweet(tweet_id: str, reply_text: str, bot: str, username: str
         client = Tweepy_clients[bot]
         auth = Tweepy_auth[bot]
         api = tweepy.API(auth)
+        if (reply_text.find("I'm sorry") != -1 and bot == "@eli5translator"):
+            await client.create_tweet(
+                text=reply_text, in_reply_to_tweet_id=tweet_id)
+            return
+
         img_byte_arr = create_image_with_text(
             text=reply_text, bot=bot, username=username)
-        media = api.media_upload(filename=tweet_id+".png", file=img_byte_arr)
+        media = api.media_upload(
+            filename=tweet_id+".png", file=img_byte_arr)
         base_url = os.environ['HOST_URL'] + bot[1:]+'/'
         url_link = base_url+tweet_id
         await client.create_tweet(
             text=get_intro_for_the_tweet(username=username, bot=bot)+f"\n\nTo read the full text, please visit: {url_link}", in_reply_to_tweet_id=tweet_id, media_ids=[media.media_id])
+
         logging.info("Successfully replied to tweet")
 
     except Exception as e:

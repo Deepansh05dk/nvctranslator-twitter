@@ -12,7 +12,7 @@ OPENAI_CLIENT = AsyncOpenAI(api_key=os.getenv('OPENAI'))
 
 prompts = {
     "@nvctranslator": "Translate into simple Nonviolent Communication (NVC) language. Be careful to distinguish pseudofeelings from feelings ",
-    "@eli5translator": "Explain the text like a 5-year-old kid. As a bot, if the question has an objective answer, then explain. Otherwise, if the question is subjective, then don't answer and say I can't. Also, if you believe there is not enough context, then you shouldn't answer. Please don't make up any fictional story around it. Make sure the answer should be of optimal length so that the user doesn't find it too long to read.",
+    "@eli5translator": "Explain the text like 5 year old kid. As a bot If the question have objective or fixed answer then only explain. Otherwise, if question is subjective then don't answer and say i can't. Also if you belief there is not enough context then also you shouldn't answer pleased don't make any friction story around it. Make sure answer should be of optimal lenght so that user don't find it too long to read.",
     "@woketranslate": "Translate into simple woke language.",
     "@makethismature": "Converts immature or simplistic language in text into a more sophisticated and mature form, perhaps for professional or academic use"
 }
