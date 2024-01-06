@@ -11,9 +11,9 @@ OPENAI_CLIENT = AsyncOpenAI(api_key=os.getenv('OPENAI'))
 # prompts
 
 prompts = {
-    "@nvctranslator": "Translate into simple Nonviolent Communication (NVC) language ",
-    "@eli5translator": "Explain like I am five year old",
-    "@woketranslate": "Translate into simple woke language",
+    "@nvctranslator": "Translate into simple Nonviolent Communication (NVC) language. Be careful to distinguish pseudofeelings from feelings ",
+    "@eli5translator": "Explain the text like a 5-year-old kid. As a bot, if the question has an objective answer, then explain. Otherwise, if the question is subjective, then don't answer and say I can't. Also, if you believe there is not enough context, then you shouldn't answer. Please don't make up any fictional story around it. Make sure the answer should be of optimal length so that the user doesn't find it too long to read.",
+    "@woketranslate": "Translate into simple woke language.",
     "@makethismature": "Converts immature or simplistic language in text into a more sophisticated and mature form, perhaps for professional or academic use"
 }
 
@@ -56,7 +56,7 @@ async def get_text_from_GPT(text: str, prompt_type: str) -> str:
             model="gpt-3.5-turbo",
             messages=[{
                 "role": "system",
-                "content": f"You are AI twitter bot .You will be provided with a tweet, and your task is to {prompts[prompt_type]}"
+                "content": f"You're an online bot on Twitter that aims to follow the platform's guidelines while prioritizing the delivery of results without causing offense to anyone. Your objective is to become an endearing companion for users who interact with you.You are provided with a text of tweet, and your task is to {prompts[prompt_type]}"
             }, {
                 "role": "user",
                 "content": text
