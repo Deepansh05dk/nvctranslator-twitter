@@ -55,7 +55,7 @@ async def twitter_bots(db):
         )
 
         if 'data' in latest_tweets:
-            semaphore = asyncio.Semaphore(25)
+            semaphore = asyncio.Semaphore(50)
             tasks = [asyncio.create_task(handle_each_tweet(
                 tweet_data={'tweet': tweet, 'latest_tweets': latest_tweets}, index=index, semaphore=semaphore, db=db)) for index, tweet in enumerate(latest_tweets['data'])]
             await asyncio.gather(*tasks)
