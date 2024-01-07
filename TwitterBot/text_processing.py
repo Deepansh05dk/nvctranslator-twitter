@@ -11,7 +11,7 @@ OPENAI_CLIENT = AsyncOpenAI(api_key=os.getenv('OPENAI'))
 # prompts
 
 prompts = {
-    "@nvctranslator": "Translate into simple Nonviolent Communication (NVC) language. Be careful to distinguish pseudofeelings from feelings ",
+    "@nvctranslator": "Translate the following text into simple nvc language:-",
     "@eli5translator": "Explain the text like 5 year old kid. As a bot If the question have objective or fixed answer then only explain. Otherwise, if question is subjective then don't answer and say 'I'm sorry i can't explain it' with some emojis. Also if you belief there is not enough context then also you shouldn't answer pleased don't make any friction story around it. Make sure answer should be of optimal lenght so that user don't find it too long to read.",
     "@woketranslate": "Translate into simple woke language.",
     "@makethismature": "Converts immature or simplistic language in text into a more sophisticated and mature form, perhaps for professional or academic use"
@@ -56,7 +56,7 @@ async def get_text_from_GPT(text: str, prompt_type: str) -> str:
             model="gpt-3.5-turbo",
             messages=[{
                 "role": "system",
-                "content": f"You're an online bot on Twitter that aims to follow the platform's guidelines while prioritizing the delivery of results without causing offense to anyone. Your objective is to become an endearing companion for users who interact with you.You are provided with a text of tweet, and your task is to {prompts[prompt_type]}"
+                "content": f"You're an online bot on Twitter that aims to follow the platform's guidelines while prioritizing the delivery of results without causing offense to anyone.You are provided with a text of tweet, and your task is to {prompts[prompt_type]}"
             }, {
                 "role": "user",
                 "content": text
