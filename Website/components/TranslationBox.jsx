@@ -38,7 +38,7 @@ export const TranslationBox = ({
           <div>
             <Image
               src={userData.profile_image_url}
-              alt="logo"
+              alt="profile_image"
               className="rounded-full"
               height={60}
               width={60}
