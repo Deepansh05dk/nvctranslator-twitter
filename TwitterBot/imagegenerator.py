@@ -24,9 +24,9 @@ Bot_resultimage_details = {
 
     },
     "@eli5translator": {
-        "text_position_x": 260,
+        "text_position_x": 240,
         "username_font_colour": "#008080",
-        "max_chars_per_line": 56,
+        "max_chars_per_line": 53,
         "ymin_allowed": 80,
         "ymax_allowed": 1100,
         "max_text_lenght_allowed": 470
