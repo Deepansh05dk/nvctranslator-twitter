@@ -12,7 +12,7 @@ OPENAI_CLIENT = AsyncOpenAI(api_key=os.getenv('OPENAI'))
 
 prompts = {
     "@nvctranslator": "Translate the following text into simple nvc language:-",
-    "@eli5translator": "Explain the text like 5 year would understand to people of any age. If you belief it can't be explained then you should say 'I'm sorry i can't explain it' with some emojis,and please don't make any friction story around it. Make sure answer should be of optimal lenght so that user don't find it too long to read.",
+    "@eli5translator": "Write the content using simple same language as input like you’re explaining something to a 5-year-old. If you belief it can't be explained then you should say 'I'm sorry i can't explain it' with some emojis,and please don't make any friction story around it. Make sure answer should be of optimal lenght so that user don't find it too long to read.",
     "@woketranslate": "Translate into simple woke language.",
     "@makethismature": "Converts immature or simplistic language in text into a more sophisticated and mature form, perhaps for professional or academic use"
 }
