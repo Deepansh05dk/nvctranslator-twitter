@@ -71,7 +71,7 @@ def extract_mentions(text: list[str]):
     return mentions
 
 
-async def reply_to_tweet(tweet_id: str, reply_text: str, bot: str, username: str):
+async def reply_to_tweet(tweet_id: str, reply_text: str, bot: str, username: str, in_reply_to_tweet_id: str):
     """
     Replies to a tweet with the given text.
     """
@@ -87,9 +87,9 @@ async def reply_to_tweet(tweet_id: str, reply_text: str, bot: str, username: str
         img_byte_arr = create_image_with_text(
             text=reply_text, bot=bot, username=username)
         media = api.media_upload(
-            filename=tweet_id+".png", file=img_byte_arr)
+            filename=in_reply_to_tweet_id+".png", file=img_byte_arr)
         base_url = os.environ['HOST_URL'] + bot[1:]+'/'
-        url_link = base_url+tweet_id
+        url_link = base_url+in_reply_to_tweet_id
         await client.create_tweet(
             text=get_intro_for_the_tweet(username=username, bot=bot)+f"\n\nTo read the full text, please visit: {url_link}", in_reply_to_tweet_id=tweet_id, media_ids=[media.media_id])
 
@@ -110,7 +110,7 @@ async def handle_each_mention(bot: str, params: dict):
         logging.info("Tweet already translated")
         translated_text = " ".join(tweet_from_database['translated_text'].split(
             "<<>>"))
-        await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=translated_text, bot=bot, username=params['userdetails_who_posted']['username'])
+        await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=translated_text, bot=bot, username=params['userdetails_who_posted']['username'], in_reply_to_tweet_id=params['in_reply_to_tweet_id'])
         return
 
     # Your code to get translated text
@@ -119,10 +119,10 @@ async def handle_each_mention(bot: str, params: dict):
     if (len(translated_text) == 0 or translated_text == None):
         logging.warning("No text recieved from translator")
         return
-    await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=translated_text, bot=bot, username=params['userdetails_who_posted']['username'])
+    await reply_to_tweet(tweet_id=params['tweet_id'], reply_text=translated_text, bot=bot, username=params['userdetails_who_posted']['username'], in_reply_to_tweet_id=params['in_reply_to_tweet_id'])
 
     # code to store translation,original and user details in database
-    await insert_tweet(db=params['db'], tweet_id=params['tweet_id'], translated_text=translated_text, userdetails_who_posted=params['userdetails_who_posted'], bot=bot, original_text=params['in_reply_to_user_text'])
+    await insert_tweet(db=params['db'], tweet_id=params['in_reply_to_tweet_id'], translated_text=translated_text, userdetails_who_posted=params['userdetails_who_posted'], bot=bot, original_text=params['in_reply_to_user_text'])
 
 
 async def handle_each_tweet(semaphore: asyncio.Semaphore, tweet_data: dict, index: int, db):
